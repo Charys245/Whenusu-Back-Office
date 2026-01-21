@@ -6,7 +6,7 @@ import { BrowserRouter, Routes, Route, Navigate } from "react-router-dom";
 import { AdminLayout } from "@/components/layout/AdminLayout";
 
 // Pages
-import Login from "./pages/Login";
+// import Login from "./pages/auth/se-connecter";
 import Dashboard from "./pages/Dashboard";
 import Traditions from "./pages/Traditions";
 import Informateurs from "./pages/Informateurs";
@@ -16,6 +16,10 @@ import Users from "./pages/Users";
 import Moderation from "./pages/Moderation";
 import Settings from "./pages/Settings";
 import NotFound from "./pages/NotFound";
+import Login from "./pages/auth/Login";
+import Register from "./pages/auth/Register";
+import ForgotPassword from "./pages/auth/ForgotPassword";
+// import Register from "./pages/auth/s-inscrire";
 
 const queryClient = new QueryClient();
 
@@ -27,10 +31,12 @@ const App = () => (
       <BrowserRouter>
         <Routes>
           {/* Public Routes */}
-          <Route path="/login" element={<Login />} />
-          
+          <Route path="/se-connecter" element={<Login />} />
+          <Route path="/s-inscrire" element={<Register />} />
+          <Route path="/mot-de-passe-oublie" element={<ForgotPassword />} />
+
           {/* Redirect root to login */}
-          <Route path="/" element={<Navigate to="/login" replace />} />
+          <Route path="/" element={<Navigate to="/se-connecter" replace />} />
 
           {/* Protected Routes (simulated) */}
           <Route element={<AdminLayout />}>

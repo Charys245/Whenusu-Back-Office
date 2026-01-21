@@ -11,6 +11,7 @@ import {
   LogOut,
 } from "lucide-react";
 import { cn } from "@/lib/utils";
+import { useAuthStore } from "@/store/authStore";
 
 const navigation = [
   { name: "Dashboard", href: "/dashboard", icon: LayoutDashboard },
@@ -25,6 +26,11 @@ const navigation = [
 
 export function AdminSidebar() {
   const location = useLocation();
+  const { logout } = useAuthStore();
+
+  const handleLogout = () => {
+    logout();
+  };
 
   return (
     <aside className="fixed left-0 top-0 z-40 h-screen w-64 bg-sidebar">
@@ -66,8 +72,9 @@ export function AdminSidebar() {
         {/* Logout */}
         <div className="border-t border-sidebar-border p-4">
           <NavLink
-            to="/login"
+            to="/se-connecter"
             className="sidebar-link text-sidebar-foreground/60 hover:text-sidebar-foreground"
+            onClick={handleLogout}
           >
             <LogOut className="h-5 w-5" />
             <span>Déconnexion</span>

@@ -6,7 +6,7 @@ const Index = () => {
 
   useEffect(() => {
     // Redirect to login page
-    navigate("/login");
+    navigate("/se-connecter");
   }, [navigate]);
 
   return null;

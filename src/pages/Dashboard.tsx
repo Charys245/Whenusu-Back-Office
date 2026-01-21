@@ -4,6 +4,7 @@ import { TimeFilter } from "@/components/dashboard/TimeFilter";
 import { RecentActivity } from "@/components/dashboard/RecentActivity";
 import { BookOpen, Languages, MapPin, Users } from "lucide-react";
 import ConsultationsChart from "@/components/dashboard/ConsultationsChart";
+import { useIsAuthenticated, useUserFullName } from "@/hooks/useAuth";
 
 const stats = [
   {
@@ -37,13 +38,18 @@ const stats = [
 ];
 
 export default function Dashboard() {
+  const isAuth = useIsAuthenticated();
+  const fullName = useUserFullName();
+
   return (
     <div>
-      <AdminHeader 
-        title="Dashboard" 
-        subtitle="Vue d'ensemble de la plateforme WHENUSU" 
+      <AdminHeader
+        title="Dashboard"
+        subtitle="Vue d'ensemble de la plateforme WHENUSU"
       />
-      
+
+      {isAuth && <p>Bonjour {fullName}</p>}
+
       <div className="p-8 space-y-8">
         {/* Time Filter */}
         <div className="flex justify-end">
