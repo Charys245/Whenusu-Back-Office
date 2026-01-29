@@ -1,4 +1,4 @@
-import { NavLink, useLocation } from "react-router-dom";
+import { NavLink, useLocation, useNavigate } from "react-router-dom";
 import {
   LayoutDashboard,
   BookOpen,
@@ -12,6 +12,7 @@ import {
 } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { useAuthStore } from "@/store/authStore";
+import { authService } from "@/services/authService";
 
 const navigation = [
   { name: "Dashboard", href: "/dashboard", icon: LayoutDashboard },
@@ -26,10 +27,17 @@ const navigation = [
 
 export function AdminSidebar() {
   const location = useLocation();
-  const { logout } = useAuthStore();
+  const authStore = useAuthStore();
+  const navigate = useNavigate();
 
-  const handleLogout = () => {
-    logout();
+  const handleLogout = async () => {
+    try {
+      await authService.logout();
+      authStore.logout();
+      navigate("/se-connecter");
+    } catch (error) {
+      console.error("Erreur lors de la déconnexion:", error);
+    }
   };
 
   return (
@@ -74,7 +82,10 @@ export function AdminSidebar() {
           <NavLink
             to="/se-connecter"
             className="sidebar-link text-sidebar-foreground/60 hover:text-sidebar-foreground"
-            onClick={handleLogout}
+            onClick={async () => {
+              await handleLogout(); // attend la déconnexion du service
+              // Optionnel: redirige après déconnexion ou effectue une autre action
+            }}
           >
             <LogOut className="h-5 w-5" />
             <span>Déconnexion</span>

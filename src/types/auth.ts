@@ -37,3 +37,31 @@ export interface RegistrationResponse {
     updatedAt: string;
   };
 }
+
+
+// ============================================
+// REGISTER
+// ============================================
+
+export interface RegisterPayload {
+  last_name: string;
+  first_name: string;
+  phone_number: string;
+  password: string;
+  email?: string;
+  region_id?: string;
+  avatar_url?: File; // Pour l'upload de fichier
+}
+
+export interface RegisterResponse {
+  message: string;
+  data: {
+    id: string;
+    lastName: string;
+    firstName: string;
+    email: string;
+    phoneNumber: string;
+    createdAt: string;
+    updatedAt: string;
+  };
+}

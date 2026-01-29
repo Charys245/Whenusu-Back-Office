@@ -39,6 +39,7 @@ import {
   TableHeader,
   TableRow,
 } from "@/components/ui/table";
+import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from "../ui/tooltip";
 
 // Types - Garde la même API simple !
 export interface Column<T> {
@@ -128,39 +129,62 @@ export function DataTable<T extends { id: string | number }>({
           const item = row.original;
           return (
             <div className="flex items-center justify-end gap-1">
-              {onView && (
-                <Button
-                  variant="ghost"
-                  size="icon"
-                  onClick={() => onView(item)}
-                  className="h-8 w-8"
-                >
-                  <Eye className="h-4 w-4" />
-                  <span className="sr-only">Voir</span>
-                </Button>
-              )}
-              {onEdit && (
-                <Button
-                  variant="ghost"
-                  size="icon"
-                  onClick={() => onEdit(item)}
-                  className="h-8 w-8"
-                >
-                  <Pencil className="h-4 w-4" />
-                  <span className="sr-only">Modifier</span>
-                </Button>
-              )}
-              {onDelete && (
-                <Button
-                  variant="ghost"
-                  size="icon"
-                  onClick={() => onDelete(item)}
-                  className="h-8 w-8 text-destructive hover:text-destructive hover:bg-destructive/10"
-                >
-                  <Trash2 className="h-4 w-4" />
-                  <span className="sr-only">Supprimer</span>
-                </Button>
-              )}
+              <TooltipProvider delayDuration={300}>
+                {onView && (
+                  <Tooltip>
+                    <TooltipTrigger asChild>
+                      <Button
+                        variant="ghost"
+                        size="icon"
+                        onClick={() => onView(item)}
+                        className="h-8 w-8 hover:bg-primary/10 hover:text-primary"
+                      >
+                        <Eye className="h-4 w-4" />
+                        <span className="sr-only">Voir</span>
+                      </Button>
+                    </TooltipTrigger>
+                    <TooltipContent>
+                      <p>Voir les détails</p>
+                    </TooltipContent>
+                  </Tooltip>
+                )}
+                {onEdit && (
+                  <Tooltip>
+                    <TooltipTrigger asChild>
+                      <Button
+                        variant="ghost"
+                        size="icon"
+                        onClick={() => onEdit(item)}
+                        className="h-8 w-8 hover:bg-blue-500/10 hover:text-blue-600"
+                      >
+                        <Pencil className="h-4 w-4" />
+                        <span className="sr-only">Modifier</span>
+                      </Button>
+                    </TooltipTrigger>
+                    <TooltipContent>
+                      <p>Modifier</p>
+                    </TooltipContent>
+                  </Tooltip>
+                )}
+                {onDelete && (
+                  <Tooltip>
+                    <TooltipTrigger asChild>
+                      <Button
+                        variant="ghost"
+                        size="icon"
+                        onClick={() => onDelete(item)}
+                        className="h-8 w-8 text-destructive hover:text-destructive hover:bg-destructive/10"
+                      >
+                        <Trash2 className="h-4 w-4" />
+                        <span className="sr-only">Supprimer</span>
+                      </Button>
+                    </TooltipTrigger>
+                    <TooltipContent>
+                      <p>Supprimer</p>
+                    </TooltipContent>
+                  </Tooltip>
+                )}
+              </TooltipProvider>
             </div>
           );
         },
@@ -245,13 +269,19 @@ export function DataTable<T extends { id: string | number }>({
       </div>
 
       {/* Table */}
-      <div className="overflow-hidden rounded-xl border border-border bg-card">
+      <div className="overflow-hidden rounded-xl border border-border bg-card ">
         <Table>
           <TableHeader>
             {table.getHeaderGroups().map((headerGroup) => (
-              <TableRow key={headerGroup.id} className="hover:bg-transparent">
+              <TableRow
+                key={headerGroup.id}
+                className="hhover:bg-transparent border-b border-border/50"
+              >
                 {headerGroup.headers.map((header) => (
-                  <TableHead key={header.id} className="bg-muted/50">
+                  <TableHead
+                    key={header.id}
+                    className="bg-muted/30 font-semibold text-foreground h-12"
+                  >
                     {header.isPlaceholder
                       ? null
                       : flexRender(
@@ -268,7 +298,7 @@ export function DataTable<T extends { id: string | number }>({
               table.getRowModel().rows.map((row) => (
                 <TableRow
                   key={row.id}
-                  className="transition-colors hover:bg-accent/50"
+                  className="transition-colors hover:bg-muted/50 border-b border-border/30 last:border-0"
                 >
                   {row.getVisibleCells().map((cell) => (
                     <TableCell key={cell.id}>

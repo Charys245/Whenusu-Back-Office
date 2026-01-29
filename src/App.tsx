@@ -10,8 +10,8 @@ import { AdminLayout } from "@/components/layout/AdminLayout";
 import Dashboard from "./pages/Dashboard";
 import Traditions from "./pages/Traditions";
 import Informateurs from "./pages/Informateurs";
-import Langues from "./pages/Langues";
-import Regions from "./pages/Regions";
+import Langues from "./pages/languages/Langues";
+import Regions from "./pages/regions/Regions";
 import Users from "./pages/Users";
 import Moderation from "./pages/Moderation";
 import Settings from "./pages/Settings";
@@ -19,7 +19,20 @@ import NotFound from "./pages/NotFound";
 import Login from "./pages/auth/Login";
 import Register from "./pages/auth/Register";
 import ForgotPassword from "./pages/auth/ForgotPassword";
+import ProtectedRoute from "./components/auth/ProtectedRoute";
 // import Register from "./pages/auth/s-inscrire";
+
+// Liste des routes protégées
+const protectedRoutes = [
+  { path: "/dashboard", element: <Dashboard /> },
+  { path: "/traditions", element: <Traditions /> },
+  { path: "/informateurs", element: <Informateurs /> },
+  { path: "/langues", element: <Langues /> },
+  { path: "/regions", element: <Regions /> },
+  { path: "/users", element: <Users /> },
+  { path: "/moderation", element: <Moderation /> },
+  { path: "/settings", element: <Settings /> },
+];
 
 const queryClient = new QueryClient();
 
@@ -40,14 +53,13 @@ const App = () => (
 
           {/* Protected Routes (simulated) */}
           <Route element={<AdminLayout />}>
-            <Route path="/dashboard" element={<Dashboard />} />
-            <Route path="/traditions" element={<Traditions />} />
-            <Route path="/informateurs" element={<Informateurs />} />
-            <Route path="/langues" element={<Langues />} />
-            <Route path="/regions" element={<Regions />} />
-            <Route path="/users" element={<Users />} />
-            <Route path="/moderation" element={<Moderation />} />
-            <Route path="/settings" element={<Settings />} />
+            {protectedRoutes.map(({ path, element }) => (
+              <Route
+                key={path}
+                path={path}
+                element={<ProtectedRoute>{element}</ProtectedRoute>}
+              />
+            ))}
           </Route>
 
           {/* 404 */}
