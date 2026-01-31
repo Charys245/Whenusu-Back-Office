@@ -59,6 +59,7 @@ interface DataTableProps<T> {
   searchable?: boolean;
   searchPlaceholder?: string;
   pageSize?: number;
+  showPagination?: boolean;
 }
 
 export function DataTable<T extends { id: string | number }>({
@@ -70,6 +71,7 @@ export function DataTable<T extends { id: string | number }>({
   searchable = true,
   searchPlaceholder = "Rechercher...",
   pageSize = 10,
+  showPagination = true,
 }: DataTableProps<T>) {
   const [sorting, setSorting] = useState<SortingState>([]);
   const [columnFilters, setColumnFilters] = useState<ColumnFiltersState>([]);
@@ -327,7 +329,7 @@ export function DataTable<T extends { id: string | number }>({
       </div>
 
       {/* Pagination */}
-      {data.length > 0 && (
+      {showPagination && data.length > 0 && (
         <div className="flex items-center justify-between">
           <div className="text-sm text-muted-foreground">
             {table.getFilteredRowModel().rows.length} résultat(s) au total

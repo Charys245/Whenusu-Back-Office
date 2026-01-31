@@ -6,6 +6,7 @@ import {
   Languages,
   MapPin,
   UserCog,
+  ShieldCheck,
   Shield,
   Settings,
   LogOut,
@@ -21,6 +22,7 @@ const navigation = [
   { name: "Langues", href: "/langues", icon: Languages },
   { name: "Régions", href: "/regions", icon: MapPin },
   { name: "Utilisateurs", href: "/users", icon: UserCog },
+  { name: "Rôles & Permissions", href: "/roles", icon: ShieldCheck },
   { name: "Modération", href: "/moderation", icon: Shield },
   { name: "Paramètres", href: "/settings", icon: Settings },
 ];

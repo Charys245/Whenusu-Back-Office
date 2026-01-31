@@ -8,75 +8,108 @@ import {
   Eye,
   EyeOff,
   Lock,
-  User,
+  Mail,
   Loader2,
   CheckCircle2,
   AlertCircle,
   ArrowLeft,
+  KeyRound,
 } from "lucide-react";
 import { CURRENT_YEAR } from "@/constants/constants";
 import WHENUSULogo from "@/assets/logo-whenusu.png";
-
-type FormState = "idle" | "loading" | "success" | "error";
+import { usePasswordRecovery } from "@/hooks/usePasswordRecovery";
 
 export default function ForgotPassword() {
   const navigate = useNavigate();
-  const [userId, setUserId] = useState("");
+  const {
+    step,
+    email,
+    loading,
+    error,
+    verifyUser,
+    verifyOtp,
+    resetPassword,
+    resendOtp,
+    reset,
+  } = usePasswordRecovery();
+
+  // Form states
+  const [emailInput, setEmailInput] = useState("");
+  const [otpCode, setOtpCode] = useState("");
   const [newPassword, setNewPassword] = useState("");
   const [confirmPassword, setConfirmPassword] = useState("");
   const [showNewPassword, setShowNewPassword] = useState(false);
   const [showConfirmPassword, setShowConfirmPassword] = useState(false);
-  const [formState, setFormState] = useState<FormState>("idle");
-  const [errorMessage, setErrorMessage] = useState("");
-  const [successMessage, setSuccessMessage] = useState("");
 
-  const isLoading = formState === "loading";
-  const isSuccess = formState === "success";
   const passwordsMatch = newPassword === confirmPassword;
-  const canSubmit =
-    userId && newPassword && confirmPassword && passwordsMatch && !isLoading;
 
-  const handleSubmit = (e: React.FormEvent) => {
+  // Step 1: Submit email
+  const handleEmailSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    if (!canSubmit) return;
-
-    // Validate passwords match
-    if (!passwordsMatch) {
-      setFormState("error");
-      setErrorMessage("Les mots de passe ne correspondent pas.");
-      return;
+    if (!emailInput) return;
+    try {
+      await verifyUser(emailInput);
+    } catch {
+      // Error handled by hook
     }
+  };
 
-    setFormState("loading");
-    setErrorMessage("");
+  // Step 2: Submit OTP
+  const handleOtpSubmit = async (e: React.FormEvent) => {
+    e.preventDefault();
+    if (!otpCode) return;
+    try {
+      await verifyOtp(otpCode);
+    } catch {
+      // Error handled by hook
+    }
+  };
 
-    // Simulate API call - POST /api/auth/reset-password
-    setTimeout(() => {
-      // Simulate success (80% success rate for demo)
-      const isSuccessful = Math.random() > 0.2;
+  // Step 3: Submit new password
+  const handlePasswordSubmit = async (e: React.FormEvent) => {
+    e.preventDefault();
+    if (!newPassword || !confirmPassword || !passwordsMatch) return;
+    try {
+      await resetPassword(newPassword, confirmPassword);
+    } catch {
+      // Error handled by hook
+    }
+  };
 
-      if (isSuccessful) {
-        setFormState("success");
-        setSuccessMessage(
-          "Mot de passe réinitialisé avec succès ! Redirection..."
-        );
+  // Redirect after success
+  if (step === "done") {
+    setTimeout(() => navigate("/se-connecter"), 2000);
+  }
 
-        // Redirect to login after brief success message
-        setTimeout(() => {
-          navigate("/se-connecter");
-        }, 1500);
-      } else {
-        setFormState("error");
-        setErrorMessage(
-          "Échec de la réinitialisation. Veuillez vérifier votre identifiant et réessayer."
-        );
-      }
-    }, 1500);
+  const getStepTitle = () => {
+    switch (step) {
+      case "email":
+        return "Mot de passe oublié";
+      case "otp":
+        return "Vérification";
+      case "reset":
+        return "Nouveau mot de passe";
+      case "done":
+        return "Succès !";
+    }
+  };
+
+  const getStepDescription = () => {
+    switch (step) {
+      case "email":
+        return "Entrez votre adresse email pour recevoir un code de vérification";
+      case "otp":
+        return `Un code de vérification a été envoyé à ${email}`;
+      case "reset":
+        return "Créez votre nouveau mot de passe";
+      case "done":
+        return "Votre mot de passe a été réinitialisé avec succès";
+    }
   };
 
   return (
     <div className="flex min-h-screen flex-col lg:flex-row">
-      {/* Left Panel - Branding (hidden on mobile) */}
+      {/* Left Panel - Branding */}
       <div className="hidden w-1/2 bg-primary/20 lg:flex lg:flex-col lg:justify-between p-12">
         <div className="flex items-center gap-3">
           <div className="flex h-12 w-32 items-center justify-center rounded-xl mt-12">
@@ -98,7 +131,7 @@ export default function ForgotPassword() {
         </p>
       </div>
 
-      {/* Right Panel - Reset Form */}
+      {/* Right Panel - Form */}
       <div className="flex w-full flex-1 items-center justify-center px-4 py-8 sm:px-8 lg:w-1/2">
         <div className="w-full max-w-md space-y-6 sm:space-y-8">
           {/* Mobile Logo */}
@@ -113,177 +146,268 @@ export default function ForgotPassword() {
             </span>
           </div>
 
-          {/* Back to Login Link */}
-          <Link
-            to="/se-connecter"
-            className="inline-flex items-center gap-2 text-sm text-muted-foreground hover:text-foreground transition-colors"
-          >
-            <ArrowLeft className="h-4 w-4" />
-            Retour à la connexion
-          </Link>
+          {/* Back Link */}
+          {step === "email" ? (
+            <Link
+              to="/se-connecter"
+              className="inline-flex items-center gap-2 text-sm text-muted-foreground hover:text-foreground transition-colors"
+            >
+              <ArrowLeft className="h-4 w-4" />
+              Retour à la connexion
+            </Link>
+          ) : step !== "done" ? (
+            <button
+              onClick={reset}
+              className="inline-flex items-center gap-2 text-sm text-muted-foreground hover:text-foreground transition-colors"
+            >
+              <ArrowLeft className="h-4 w-4" />
+              Recommencer
+            </button>
+          ) : null}
+
+          {/* Step indicator */}
+          {step !== "done" && (
+            <div className="flex items-center justify-center gap-2">
+              {["email", "otp", "reset"].map((s, i) => (
+                <div
+                  key={s}
+                  className={`h-2 w-8 rounded-full transition-colors ${
+                    step === s
+                      ? "bg-primary"
+                      : ["email", "otp", "reset"].indexOf(step) > i
+                      ? "bg-primary/60"
+                      : "bg-muted"
+                  }`}
+                />
+              ))}
+            </div>
+          )}
 
           <div className="text-center lg:text-left">
             <h2 className="text-2xl sm:text-3xl font-bold text-foreground">
-              Mot de passe oublié
+              {getStepTitle()}
             </h2>
             <p className="mt-2 text-sm sm:text-base text-muted-foreground">
-              Entrez votre identifiant et créez un nouveau mot de passe
+              {getStepDescription()}
             </p>
           </div>
 
-          {/* Success Message */}
-          {isSuccess && successMessage && (
+          {/* Success Message for done step */}
+          {step === "done" && (
             <Alert className="border-green-500/50 bg-green-500/10">
               <CheckCircle2 className="h-4 w-4 text-green-600" />
               <AlertDescription className="text-green-600">
-                {successMessage}
+                Mot de passe réinitialisé ! Redirection vers la connexion...
               </AlertDescription>
             </Alert>
           )}
 
           {/* Error Message */}
-          {formState === "error" && errorMessage && (
+          {error && (
             <Alert variant="destructive">
               <AlertCircle className="h-4 w-4" />
-              <AlertDescription>{errorMessage}</AlertDescription>
+              <AlertDescription>{error}</AlertDescription>
             </Alert>
           )}
 
-          <form onSubmit={handleSubmit} className="space-y-4 sm:space-y-5">
-            {/* User ID Field */}
-            <div className="space-y-2">
-              <Label htmlFor="userId">
-                Identifiant utilisateur{" "}
-                <span className="text-destructive">*</span>
-              </Label>
-              <div className="relative">
-                <User className="absolute left-3 top-1/2 h-4 w-4 sm:h-5 sm:w-5 -translate-y-1/2 text-muted-foreground" />
-                <Input
-                  id="userId"
-                  type="text"
-                  placeholder="Votre identifiant"
-                  className="pl-10 h-11 sm:h-12"
-                  value={userId}
-                  onChange={(e) => setUserId(e.target.value)}
-                  disabled={isLoading || isSuccess}
-                  required
-                />
+          {/* Step 1: Email Form */}
+          {step === "email" && (
+            <form onSubmit={handleEmailSubmit} className="space-y-4 sm:space-y-5">
+              <div className="space-y-2">
+                <Label htmlFor="email">
+                  Adresse email <span className="text-destructive">*</span>
+                </Label>
+                <div className="relative">
+                  <Mail className="absolute left-3 top-1/2 h-4 w-4 sm:h-5 sm:w-5 -translate-y-1/2 text-muted-foreground" />
+                  <Input
+                    id="email"
+                    type="email"
+                    placeholder="exemple@email.com"
+                    className="pl-10 h-11 sm:h-12"
+                    value={emailInput}
+                    onChange={(e) => setEmailInput(e.target.value)}
+                    disabled={loading}
+                    required
+                  />
+                </div>
               </div>
-            </div>
 
-            {/* New Password Field */}
-            <div className="space-y-2">
-              <Label htmlFor="newPassword">
-                Nouveau mot de passe <span className="text-destructive">*</span>
-              </Label>
-              <div className="relative">
-                <Lock className="absolute left-3 top-1/2 h-4 w-4 sm:h-5 sm:w-5 -translate-y-1/2 text-muted-foreground" />
-                <Input
-                  id="newPassword"
-                  type={showNewPassword ? "text" : "password"}
-                  placeholder="••••••••"
-                  className="pl-10 pr-10 h-11 sm:h-12"
-                  value={newPassword}
-                  onChange={(e) => setNewPassword(e.target.value)}
-                  disabled={isLoading || isSuccess}
-                  required
-                />
+              <Button
+                type="submit"
+                className="w-full h-11 sm:h-12 text-base"
+                size="lg"
+                disabled={!emailInput || loading}
+              >
+                {loading ? (
+                  <>
+                    <Loader2 className="mr-2 h-4 w-4 animate-spin" />
+                    Vérification...
+                  </>
+                ) : (
+                  "Envoyer le code"
+                )}
+              </Button>
+            </form>
+          )}
+
+          {/* Step 2: OTP Form */}
+          {step === "otp" && (
+            <form onSubmit={handleOtpSubmit} className="space-y-4 sm:space-y-5">
+              <div className="space-y-2">
+                <Label htmlFor="otp">
+                  Code de vérification <span className="text-destructive">*</span>
+                </Label>
+                <div className="relative">
+                  <KeyRound className="absolute left-3 top-1/2 h-4 w-4 sm:h-5 sm:w-5 -translate-y-1/2 text-muted-foreground" />
+                  <Input
+                    id="otp"
+                    type="text"
+                    placeholder="Entrez le code reçu"
+                    className="pl-10 h-11 sm:h-12 text-center tracking-widest"
+                    value={otpCode}
+                    onChange={(e) => setOtpCode(e.target.value)}
+                    disabled={loading}
+                    maxLength={6}
+                    required
+                  />
+                </div>
+              </div>
+
+              <Button
+                type="submit"
+                className="w-full h-11 sm:h-12 text-base"
+                size="lg"
+                disabled={!otpCode || loading}
+              >
+                {loading ? (
+                  <>
+                    <Loader2 className="mr-2 h-4 w-4 animate-spin" />
+                    Vérification...
+                  </>
+                ) : (
+                  "Vérifier le code"
+                )}
+              </Button>
+
+              <p className="text-center text-sm text-muted-foreground">
+                Vous n'avez pas reçu le code ?{" "}
                 <button
                   type="button"
-                  className="absolute right-3 top-1/2 -translate-y-1/2 text-muted-foreground hover:text-foreground transition-colors disabled:opacity-50"
-                  onClick={() => setShowNewPassword(!showNewPassword)}
-                  disabled={isLoading || isSuccess}
+                  onClick={resendOtp}
+                  disabled={loading}
+                  className="font-medium text-primary hover:underline disabled:opacity-50"
                 >
-                  {showNewPassword ? (
-                    <EyeOff className="h-4 w-4 sm:h-5 sm:w-5" />
-                  ) : (
-                    <Eye className="h-4 w-4 sm:h-5 sm:w-5" />
-                  )}
+                  Renvoyer
                 </button>
-              </div>
-            </div>
+              </p>
+            </form>
+          )}
 
-            {/* Confirm Password Field */}
-            <div className="space-y-2">
-              <Label htmlFor="confirmPassword">
-                Confirmer le mot de passe{" "}
-                <span className="text-destructive">*</span>
-              </Label>
-              <div className="relative">
-                <Lock className="absolute left-3 top-1/2 h-4 w-4 sm:h-5 sm:w-5 -translate-y-1/2 text-muted-foreground" />
-                <Input
-                  id="confirmPassword"
-                  type={showConfirmPassword ? "text" : "password"}
-                  placeholder="••••••••"
-                  className={`pl-10 pr-10 h-11 sm:h-12 ${
-                    confirmPassword && !passwordsMatch
-                      ? "border-destructive focus-visible:ring-destructive"
-                      : confirmPassword && passwordsMatch
-                      ? "border-green-500 focus-visible:ring-green-500"
-                      : ""
-                  }`}
-                  value={confirmPassword}
-                  onChange={(e) => setConfirmPassword(e.target.value)}
-                  disabled={isLoading || isSuccess}
-                  required
-                />
-                <button
-                  type="button"
-                  className="absolute right-3 top-1/2 -translate-y-1/2 text-muted-foreground hover:text-foreground transition-colors disabled:opacity-50"
-                  onClick={() => setShowConfirmPassword(!showConfirmPassword)}
-                  disabled={isLoading || isSuccess}
-                >
-                  {showConfirmPassword ? (
-                    <EyeOff className="h-4 w-4 sm:h-5 sm:w-5" />
-                  ) : (
-                    <Eye className="h-4 w-4 sm:h-5 sm:w-5" />
-                  )}
-                </button>
+          {/* Step 3: New Password Form */}
+          {step === "reset" && (
+            <form onSubmit={handlePasswordSubmit} className="space-y-4 sm:space-y-5">
+              <div className="space-y-2">
+                <Label htmlFor="newPassword">
+                  Nouveau mot de passe <span className="text-destructive">*</span>
+                </Label>
+                <div className="relative">
+                  <Lock className="absolute left-3 top-1/2 h-4 w-4 sm:h-5 sm:w-5 -translate-y-1/2 text-muted-foreground" />
+                  <Input
+                    id="newPassword"
+                    type={showNewPassword ? "text" : "password"}
+                    placeholder="••••••••"
+                    className="pl-10 pr-10 h-11 sm:h-12"
+                    value={newPassword}
+                    onChange={(e) => setNewPassword(e.target.value)}
+                    disabled={loading}
+                    required
+                  />
+                  <button
+                    type="button"
+                    className="absolute right-3 top-1/2 -translate-y-1/2 text-muted-foreground hover:text-foreground transition-colors"
+                    onClick={() => setShowNewPassword(!showNewPassword)}
+                  >
+                    {showNewPassword ? (
+                      <EyeOff className="h-4 w-4 sm:h-5 sm:w-5" />
+                    ) : (
+                      <Eye className="h-4 w-4 sm:h-5 sm:w-5" />
+                    )}
+                  </button>
+                </div>
               </div>
-              {/* Password match indicator */}
-              {confirmPassword && (
-                <p
-                  className={`text-xs ${
-                    passwordsMatch ? "text-green-600" : "text-destructive"
-                  }`}
-                >
-                  {passwordsMatch ? (
-                    <span className="flex items-center gap-1">
-                      <CheckCircle2 className="h-3 w-3" />
-                      Les mots de passe correspondent
-                    </span>
-                  ) : (
-                    <span className="flex items-center gap-1">
-                      <AlertCircle className="h-3 w-3" />
-                      Les mots de passe ne correspondent pas
-                    </span>
-                  )}
-                </p>
-              )}
-            </div>
 
-            {/* Submit Button */}
-            <Button
-              type="submit"
-              className="w-full h-11 sm:h-12 text-base"
-              size="lg"
-              disabled={!canSubmit || isSuccess}
-            >
-              {isLoading ? (
-                <>
-                  <Loader2 className="mr-2 h-4 w-4 animate-spin" />
-                  Réinitialisation en cours...
-                </>
-              ) : isSuccess ? (
-                <>
-                  <CheckCircle2 className="mr-2 h-4 w-4" />
-                  Réinitialisé !
-                </>
-              ) : (
-                "Réinitialiser le mot de passe"
-              )}
-            </Button>
-          </form>
+              <div className="space-y-2">
+                <Label htmlFor="confirmPassword">
+                  Confirmer le mot de passe <span className="text-destructive">*</span>
+                </Label>
+                <div className="relative">
+                  <Lock className="absolute left-3 top-1/2 h-4 w-4 sm:h-5 sm:w-5 -translate-y-1/2 text-muted-foreground" />
+                  <Input
+                    id="confirmPassword"
+                    type={showConfirmPassword ? "text" : "password"}
+                    placeholder="••••••••"
+                    className={`pl-10 pr-10 h-11 sm:h-12 ${
+                      confirmPassword && !passwordsMatch
+                        ? "border-destructive focus-visible:ring-destructive"
+                        : confirmPassword && passwordsMatch
+                        ? "border-green-500 focus-visible:ring-green-500"
+                        : ""
+                    }`}
+                    value={confirmPassword}
+                    onChange={(e) => setConfirmPassword(e.target.value)}
+                    disabled={loading}
+                    required
+                  />
+                  <button
+                    type="button"
+                    className="absolute right-3 top-1/2 -translate-y-1/2 text-muted-foreground hover:text-foreground transition-colors"
+                    onClick={() => setShowConfirmPassword(!showConfirmPassword)}
+                  >
+                    {showConfirmPassword ? (
+                      <EyeOff className="h-4 w-4 sm:h-5 sm:w-5" />
+                    ) : (
+                      <Eye className="h-4 w-4 sm:h-5 sm:w-5" />
+                    )}
+                  </button>
+                </div>
+                {confirmPassword && (
+                  <p
+                    className={`text-xs ${
+                      passwordsMatch ? "text-green-600" : "text-destructive"
+                    }`}
+                  >
+                    {passwordsMatch ? (
+                      <span className="flex items-center gap-1">
+                        <CheckCircle2 className="h-3 w-3" />
+                        Les mots de passe correspondent
+                      </span>
+                    ) : (
+                      <span className="flex items-center gap-1">
+                        <AlertCircle className="h-3 w-3" />
+                        Les mots de passe ne correspondent pas
+                      </span>
+                    )}
+                  </p>
+                )}
+              </div>
+
+              <Button
+                type="submit"
+                className="w-full h-11 sm:h-12 text-base"
+                size="lg"
+                disabled={!newPassword || !confirmPassword || !passwordsMatch || loading}
+              >
+                {loading ? (
+                  <>
+                    <Loader2 className="mr-2 h-4 w-4 animate-spin" />
+                    Réinitialisation...
+                  </>
+                ) : (
+                  "Réinitialiser le mot de passe"
+                )}
+              </Button>
+            </form>
+          )}
 
           {/* Back to login link */}
           <p className="text-center text-sm text-muted-foreground">

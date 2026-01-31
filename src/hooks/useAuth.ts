@@ -1,3 +1,4 @@
+import { useShallow } from "zustand/react/shallow";
 import { useAuthStore } from "@/store/authStore";
 
 /** Hook pour vérifier si connecté */
@@ -9,10 +10,15 @@ export const useCurrentUser = () => useAuthStore((state) => state.user);
 
 /** Hook pour les actions */
 export const useAuthActions = () =>
-  useAuthStore((state) => ({
-    setCredentials: state.setCredentials,
-    logout: state.logout,
-  }));
+  useAuthStore(
+    useShallow((state) => ({
+      setCredentials: state.setCredentials,
+      logout: state.logout,
+    }))
+  );
+
+/** Hook pour logout uniquement */
+export const useLogout = () => useAuthStore((state) => state.logout);
 
 /** Hook pour nom complet */
 export const useUserFullName = () =>

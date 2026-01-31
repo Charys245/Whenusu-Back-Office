@@ -1,7 +1,5 @@
-import { z } from "zod";
 import { httpClient } from "./http";
 import type {
-  // Region,
   CreateRegionPayload,
   UpdateRegionPayload,
   AssignLanguagesPayload,
@@ -13,56 +11,6 @@ import type {
   UpdateRegionResponse,
 } from "@/types/region";
 import { handleApiError } from "@/utils/errorHandler";
-
-// ============================================
-// SCHÉMAS DE VALIDATION ZOD
-// ============================================
-
-const createRegionSchema = z.object({
-  name: z.string().min(1, "Le nom de la région est requis"),
-  location: z.string().min(1, "La localisation est requise"),
-  // longitude: z.number().min(-180).max(180, "Longitude invalide"),
-  // latitude: z.number().min(-90).max(90, "Latitude invalide"),
-});
-
-const updateRegionSchema = z.object({
-  name: z.string().min(1, "Le nom est requis").optional(),
-  location: z.string().min(1, "La localisation est requise").optional(),
-  // longitude: z.number().min(-180).max(180).optional(),
-  // latitude: z.number().min(-90).max(90).optional(),
-});
-
-const assignLanguagesSchema = z.object({
-  languages: z
-    .array(z.string())
-    .min(1, "Au moins une langue doit être sélectionnée"),
-});
-
-const regionResponseSchema = z.object({
-  id: z.string().optional(),
-  name: z.string(),
-  slug: z.string(),
-  location: z.string(),
-  longitude: z.number(),
-  latitude: z.number(),
-  created_at: z.string().optional(),
-  updated_at: z.string().optional(),
-});
-
-// ============================================
-// TYPES D'ERREURS
-// ============================================
-
-interface ApiErrorResponse {
-  message?: string;
-  status?: number;
-  data?: any;
-  response?: {
-    data?: {
-      message?: string;
-    };
-  };
-}
 
 // ============================================
 // SERVICE REGION
@@ -118,9 +66,6 @@ export const regionService = {
    */
   create: async (payload: CreateRegionPayload): Promise<Region> => {
     try {
-      // Validation des données d'entrée
-      createRegionSchema.parse(payload);
-
       const response = await httpClient.post<CreateRegionResponse>(
         "/regions",
         payload
@@ -144,9 +89,6 @@ export const regionService = {
   update: async (id: string, payload: UpdateRegionPayload): Promise<Region> => {
     try {
       if (!id) throw new Error("L'ID de la région est requis");
-
-      // Validation des données d'entrée
-      updateRegionSchema.parse(payload);
 
       const response = await httpClient.put<UpdateRegionResponse>(
         `/regions/${id}`,
@@ -194,10 +136,6 @@ export const regionService = {
     try {
       if (!id) throw new Error("L'ID de la région est requis");
 
-      // Validation
-      assignLanguagesSchema.parse(payload);
-
-      // Création du FormData
       const formData = new FormData();
       payload.languages.forEach((languageId) => {
         formData.append("languages[]", languageId);
@@ -213,21 +151,12 @@ export const regionService = {
         }
       );
 
-      // const validatedData = regionResponseSchema.parse(response.data);
-
       return response.data;
     } catch (error) {
-      if (error instanceof z.ZodError) {
-        throw new Error(error.message);
-        // throw new Error(error.errors[0].message);
-      }
-
-      const apiError = error as ApiErrorResponse;
-      const errorMessage =
-        apiError.response?.data?.message ||
-        apiError.message ||
-        "Erreur lors de l'assignation des langues";
-
+      const errorMessage = handleApiError(
+        error,
+        "Erreur lors de l'assignation des langues"
+      );
       console.error("Erreur assignLanguages:", errorMessage);
       throw new Error(errorMessage);
     }
@@ -244,10 +173,6 @@ export const regionService = {
     try {
       if (!id) throw new Error("L'ID de la région est requis");
 
-      // Validation
-      assignLanguagesSchema.parse(payload);
-
-      // Création du FormData
       const formData = new FormData();
       payload.languages.forEach((languageId) => {
         formData.append("languages[]", languageId);
@@ -263,31 +188,14 @@ export const regionService = {
         }
       );
 
-      // const validatedData = regionResponseSchema.parse(response.data);
-
       return response.data;
     } catch (error) {
-      if (error instanceof z.ZodError) {
-        throw new Error(error.message);
-        // throw new Error(error.errors[0].message);
-      }
-
-      const apiError = error as ApiErrorResponse;
-      const errorMessage =
-        apiError.response?.data?.message ||
-        apiError.message ||
-        "Erreur lors du détachement des langues";
-
+      const errorMessage = handleApiError(
+        error,
+        "Erreur lors du détachement des langues"
+      );
       console.error("Erreur unassignLanguages:", errorMessage);
       throw new Error(errorMessage);
     }
   },
-};
-
-// Export des schémas pour réutilisation
-export {
-  createRegionSchema,
-  updateRegionSchema,
-  assignLanguagesSchema,
-  regionResponseSchema,
 };

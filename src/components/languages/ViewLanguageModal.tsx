@@ -38,21 +38,21 @@ export const ViewLanguageModal = ({
             <p className="text-base">{language.slug}</p>
           </div>
 
-          {language.created_at && (
+          {language.createdAt && (
             <div>
               <p className="text-sm font-medium text-muted-foreground">
                 Date de création
               </p>
-              <p className="text-base">{formatDateTime(language.created_at)}</p>
+              <p className="text-base">{formatDateTime(language.createdAt)}</p>
             </div>
           )}
 
-          {language.updated_at && (
+          {language.updatedAt && (
             <div>
               <p className="text-sm font-medium text-muted-foreground">
                 Dernière modification
               </p>
-              <p className="text-base">{formatDateTime(language.updated_at)}</p>
+              <p className="text-base">{formatDateTime(language.updatedAt)}</p>
             </div>
           )}
         </div>

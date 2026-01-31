@@ -31,13 +31,13 @@ const specificErrorMessages: Record<
   string,
   (field: string, message: string) => string | null
 > = {
-  longitude: (field, message) => {
+  longitude: (__field, message) => {
     if (message.includes("<=180") || message.includes(">=-180")) {
       return "La longitude doit être entre -180 et 180";
     }
     return null;
   },
-  latitude: (field, message) => {
+  latitude: (__field, message) => {
     if (message.includes("<=90") || message.includes(">=-90")) {
       return "La latitude doit être entre -90 et 90";
     }

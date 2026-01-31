@@ -13,6 +13,7 @@ import Informateurs from "./pages/Informateurs";
 import Langues from "./pages/languages/Langues";
 import Regions from "./pages/regions/Regions";
 import Users from "./pages/Users";
+import Roles from "./pages/Roles";
 import Moderation from "./pages/Moderation";
 import Settings from "./pages/Settings";
 import NotFound from "./pages/NotFound";
@@ -30,6 +31,7 @@ const protectedRoutes = [
   { path: "/langues", element: <Langues /> },
   { path: "/regions", element: <Regions /> },
   { path: "/users", element: <Users /> },
+  { path: "/roles", element: <Roles /> },
   { path: "/moderation", element: <Moderation /> },
   { path: "/settings", element: <Settings /> },
 ];

@@ -1,49 +1,24 @@
 import { httpClient } from "./http";
-import { z } from "zod";
+import { handleApiError } from "@/utils/errorHandler";
 import type {
   LoginResponse,
   LoginWithEmailPayload,
   LoginWithPhonePayload,
   RegisterPayload,
   RegisterResponse,
+  GetUserProfileResponse,
+  UpdateProfilePayload,
+  UpdateProfileResponse,
+  UpdatePasswordPayload,
+  UpdatePasswordResponse,
+  DeleteAccountResponse,
+  VerifyUserPayload,
+  VerifyUserResponse,
+  VerifyOtpPayload,
+  VerifyOtpResponse,
+  ForgotPasswordPayload,
+  ForgotPasswordResponse,
 } from "@/types/auth";
-
-// Schéma pour l'inscription
-const registerSchema = z.object({
-  last_name: z.string().min(1, "Le nom est requis"),
-  first_name: z.string().min(1, "Le prénom est requis"),
-  phone_number: z.string().min(1, "Le numéro de téléphone est requis"),
-  password: z
-    .string()
-    .min(6, "Le mot de passe doit contenir au moins 6 caractères"),
-  email: z.string().email("Email invalide").optional().or(z.literal("")),
-});
-
-// ============================================
-// SCHÉMAS DE VALIDATION ZOD
-// ============================================
-const loginWithEmailSchema = z.object({
-  email: z
-    .string()
-    .min(1, "L'email est requis")
-    .email("Format d'email invalide"),
-  password: z
-    .string()
-    .min(3, "Le mot de passe doit contenir au moins 3 caractères"),
-});
-
-const loginWithPhoneSchema = z.object({
-  phone_number: z
-    .string()
-    .min(1, "Le numéro de téléphone est requis")
-    .regex(
-      /^\+?[1-9]\d{1,14}$/,
-      "Format de numéro de téléphone invalide (ex: +229XXXXXXXX)"
-    ),
-  password: z
-    .string()
-    .min(3, "Le mot de passe doit contenir au moins 3 caractères"),
-});
 
 // ============================================
 // TYPES
@@ -72,10 +47,7 @@ export const authService = {
    */
   register: async (payload: RegisterPayload): Promise<RegisterResponse> => {
     try {
-      // 1. Validation des données d'entrée avec Zod
-      registerSchema.parse(payload);
-
-      // 2. Création du FormData pour multipart/form-data
+      // Création du FormData pour multipart/form-data
       const formData = new FormData();
       formData.append("last_name", payload.last_name);
       formData.append("first_name", payload.first_name);
@@ -93,7 +65,7 @@ export const authService = {
         formData.append("avatar_url", payload.avatar_url);
       }
 
-      // 3. Appel API
+      // Appel API
       const response = await httpClient.post<RegisterResponse>(
         "/auth/register/",
         formData,
@@ -104,21 +76,8 @@ export const authService = {
         }
       );
 
-      // 4. Retour des données
       return response.data;
     } catch (error) {
-      // Gestion des erreurs Zod
-      // if (error instanceof z.ZodError) {
-      //   // const firstError = error.errors[0];
-      //   throw new Error(firstError.message);
-      // }
-
-      if (error instanceof z.ZodError) {
-        // const firstError = error.errors[0];
-        throw new Error(error.message);
-      }
-
-      // Gestion des erreurs API
       const apiError = error as ApiErrorResponse;
       const errorMessage =
         apiError.response?.data?.message ||
@@ -142,34 +101,13 @@ export const authService = {
    */
   login: async (credentials: LoginCredentials): Promise<LoginResponse> => {
     try {
-      // 1. Validation des données d'entrée avec Zod
-      if ("email" in credentials && credentials.email) {
-        loginWithEmailSchema.parse(credentials);
-      } else if ("phone_number" in credentials && credentials.phone_number) {
-        loginWithPhoneSchema.parse(credentials);
-      } else {
-        throw new Error("Email ou numéro de téléphone requis");
-      }
-
-      // 2. Appel API
       const response = await httpClient.post<LoginResponse>(
         "/auth/login/",
         credentials
       );
 
-      // 3. Validation de la réponse API
-      const validatedData = response.data;
-
-      // 4. Retour des données validées
-      return validatedData;
+      return response.data;
     } catch (error) {
-      // Gestion des erreurs Zod
-      if (error instanceof z.ZodError) {
-        // const firstError = error.errors[0];
-        throw new Error(error.message);
-      }
-
-      // Gestion des erreurs API
       const apiError = error as ApiErrorResponse;
       const errorMessage =
         apiError.response?.data?.message ||
@@ -202,7 +140,6 @@ export const authService = {
 
   /**
    * Rafraîchissement du token
-   * Note: À implémenter selon ton API
    */
   refreshToken: async (refreshToken: string): Promise<{ token: string }> => {
     try {
@@ -216,7 +153,198 @@ export const authService = {
       throw error;
     }
   },
+
+  // ============================================
+  // USER PROFILE
+  // ============================================
+
+  /**
+   * GET /api/auth/user
+   * Récupère le profil de l'utilisateur connecté
+   */
+  getUserProfile: async (): Promise<GetUserProfileResponse> => {
+    try {
+      const response =
+        await httpClient.get<GetUserProfileResponse>("/auth/user");
+      return response.data;
+    } catch (error) {
+      const errorMessage = handleApiError(
+        error,
+        "Erreur lors de la récupération du profil"
+      );
+      console.error("Erreur getUserProfile:", errorMessage);
+      throw new Error(errorMessage);
+    }
+  },
+
+  /**
+   * POST /api/auth/update-profile
+   * Modifie le profil de l'utilisateur connecté
+   * L'API attend multipart/form-data
+   */
+  updateProfile: async (
+    payload: UpdateProfilePayload
+  ): Promise<UpdateProfileResponse> => {
+    try {
+      const formData = new FormData();
+
+      // Ajouter uniquement les champs non vides
+      if (payload.last_name?.trim()) {
+        formData.append("last_name", payload.last_name.trim());
+      }
+      if (payload.first_name?.trim()) {
+        formData.append("first_name", payload.first_name.trim());
+      }
+      if (payload.email?.trim()) {
+        formData.append("email", payload.email.trim());
+      }
+      if (payload.phone_number?.trim()) {
+        formData.append("phone_number", payload.phone_number.trim());
+      }
+      if (payload.region_id?.trim()) {
+        formData.append("region_id", payload.region_id.trim());
+      }
+      if (payload.avatar_url instanceof File) {
+        formData.append("avatar_url", payload.avatar_url);
+      }
+      if (payload.send_notif !== undefined) {
+        formData.append("send_notif", String(payload.send_notif));
+      }
+
+      const response = await httpClient.post<UpdateProfileResponse>(
+        "/auth/update-profile",
+        formData
+      );
+
+      return response.data;
+    } catch (error) {
+      const errorMessage = handleApiError(
+        error,
+        "Erreur lors de la modification du profil"
+      );
+      console.error("Erreur updateProfile:", errorMessage);
+      throw new Error(errorMessage);
+    }
+  },
+
+  // ============================================
+  // PASSWORD
+  // ============================================
+
+  /**
+   * POST /api/auth/update-password
+   * Change le mot de passe de l'utilisateur connecté
+   */
+  updatePassword: async (
+    payload: UpdatePasswordPayload
+  ): Promise<UpdatePasswordResponse> => {
+    try {
+      const response = await httpClient.post<UpdatePasswordResponse>(
+        "/auth/update-password",
+        payload
+      );
+      return response.data;
+    } catch (error) {
+      const errorMessage = handleApiError(
+        error,
+        "Erreur lors du changement de mot de passe"
+      );
+      console.error("Erreur updatePassword:", errorMessage);
+      throw new Error(errorMessage);
+    }
+  },
+
+  // ============================================
+  // DELETE ACCOUNT
+  // ============================================
+
+  /**
+   * POST /api/auth/delete-account
+   * Supprime le compte de l'utilisateur connecté
+   */
+  deleteAccount: async (): Promise<DeleteAccountResponse> => {
+    try {
+      const response = await httpClient.post<DeleteAccountResponse>(
+        "/auth/delete-account"
+      );
+      return response.data;
+    } catch (error) {
+      const errorMessage = handleApiError(
+        error,
+        "Erreur lors de la suppression du compte"
+      );
+      console.error("Erreur deleteAccount:", errorMessage);
+      throw new Error(errorMessage);
+    }
+  },
+
+  // ============================================
+  // PASSWORD RECOVERY (3 steps)
+  // ============================================
+
+  /**
+   * POST /api/auth/verify-user
+   * Étape 1: Vérifie que l'utilisateur existe et envoie un code OTP
+   */
+  verifyUser: async (payload: VerifyUserPayload): Promise<VerifyUserResponse> => {
+    try {
+      const response = await httpClient.post<VerifyUserResponse>(
+        "/auth/verify-user",
+        payload
+      );
+      return response.data;
+    } catch (error) {
+      const errorMessage = handleApiError(
+        error,
+        "Erreur lors de la vérification de l'utilisateur"
+      );
+      console.error("Erreur verifyUser:", errorMessage);
+      throw new Error(errorMessage);
+    }
+  },
+
+  /**
+   * POST /api/auth/verify-otp-code
+   * Étape 2: Vérifie le code OTP envoyé par email
+   */
+  verifyOtpCode: async (payload: VerifyOtpPayload): Promise<VerifyOtpResponse> => {
+    try {
+      const response = await httpClient.post<VerifyOtpResponse>(
+        "/auth/verify-otp-code",
+        payload
+      );
+      return response.data;
+    } catch (error) {
+      const errorMessage = handleApiError(
+        error,
+        "Erreur lors de la vérification du code OTP"
+      );
+      console.error("Erreur verifyOtpCode:", errorMessage);
+      throw new Error(errorMessage);
+    }
+  },
+
+  /**
+   * POST /api/auth/forgot-password
+   * Étape 3: Réinitialise le mot de passe avec le userId obtenu à l'étape 2
+   */
+  forgotPassword: async (
+    payload: ForgotPasswordPayload
+  ): Promise<ForgotPasswordResponse> => {
+    try {
+      const response = await httpClient.post<ForgotPasswordResponse>(
+        "/auth/forgot-password",
+        payload
+      );
+      return response.data;
+    } catch (error) {
+      const errorMessage = handleApiError(
+        error,
+        "Erreur lors de la réinitialisation du mot de passe"
+      );
+      console.error("Erreur forgotPassword:", errorMessage);
+      throw new Error(errorMessage);
+    }
+  },
 };
 
-// Export des schémas pour réutilisation si nécessaire
-export { loginWithEmailSchema, loginWithPhoneSchema };
