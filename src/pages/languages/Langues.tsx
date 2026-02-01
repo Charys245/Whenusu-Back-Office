@@ -13,7 +13,7 @@ import type { Language } from "@/types/language";
 import { useLanguages } from "@/hooks/useLanguages";
 import { ViewLanguageModal } from "@/components/languages/ViewLanguageModal";
 import { EditLanguageModal } from "@/components/languages/EditLanguageModal";
-import { DeleteConfirmDialog } from "@/components/regions/DeleteConfirmDialog";
+import { DeleteConfirmDialog } from "@/components/languages/DeleteConfirmDialog";
 
 // interface Langue {
 //   id: string;

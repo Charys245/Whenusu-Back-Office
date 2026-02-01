@@ -12,6 +12,7 @@ import Traditions from "./pages/Traditions";
 import Informateurs from "./pages/Informateurs";
 import Langues from "./pages/languages/Langues";
 import Regions from "./pages/regions/Regions";
+import Categories from "./pages/categories/Categories";
 import Users from "./pages/Users";
 import Roles from "./pages/Roles";
 import Moderation from "./pages/Moderation";
@@ -28,6 +29,7 @@ const protectedRoutes = [
   { path: "/dashboard", element: <Dashboard /> },
   { path: "/traditions", element: <Traditions /> },
   { path: "/informateurs", element: <Informateurs /> },
+  { path: "/categories", element: <Categories /> },
   { path: "/langues", element: <Langues /> },
   { path: "/regions", element: <Regions /> },
   { path: "/users", element: <Users /> },

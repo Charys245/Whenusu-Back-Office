@@ -17,6 +17,7 @@ import { authService } from "@/services/authService";
 
 const navigation = [
   { name: "Dashboard", href: "/dashboard", icon: LayoutDashboard },
+  { name: "Catégories", href: "/categories", icon: LayoutDashboard },
   { name: "Traditions", href: "/traditions", icon: BookOpen },
   { name: "Informateurs", href: "/informateurs", icon: Users },
   { name: "Langues", href: "/langues", icon: Languages },

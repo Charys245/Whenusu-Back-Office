@@ -2,7 +2,7 @@ import { Bell, Search } from "lucide-react";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
-import { useCurrentUser, useUserFullName } from "@/hooks/useAuth";
+import { useCurrentUser, useUserFullName, useUserInitials } from "@/hooks/useAuth";
 
 interface AdminHeaderProps {
   title: string;
@@ -12,6 +12,7 @@ interface AdminHeaderProps {
 export function AdminHeader({ title, subtitle }: AdminHeaderProps) {
   const user = useCurrentUser();
   const fullName = useUserFullName();
+  const initials = useUserInitials();
 
   return (
     <header className="sticky top-0 z-30 flex h-20 items-center justify-between border-b border-border bg-card/80 backdrop-blur-sm px-8">
@@ -44,14 +45,13 @@ export function AdminHeader({ title, subtitle }: AdminHeaderProps) {
         {/* User Menu */}
         <div className="flex items-center gap-3 rounded-lg bg-muted/50 px-3 py-2">
           <Avatar className="h-8 w-8">
-            <AvatarImage src="" />
-            {user?.avatar_url && <img src={user.avatar_url} alt={fullName} />}
+            {user?.avatar_url && <AvatarImage src={user.avatar_url} alt={fullName} />}
             <AvatarFallback className="bg-primary text-primary-foreground text-sm">
-              AD
+              {initials || "U"}
             </AvatarFallback>
           </Avatar>
           <div className="hidden lg:block">
-            <p className="text-sm font-medium">Admin User</p>
+            <p className="text-sm font-medium">{fullName || "Utilisateur"}</p>
             <p className="text-xs text-muted-foreground">Administrateur</p>
           </div>
         </div>

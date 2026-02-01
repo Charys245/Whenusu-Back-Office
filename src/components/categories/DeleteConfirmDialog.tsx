@@ -8,12 +8,12 @@ import {
   AlertDialogHeader,
   AlertDialogTitle,
 } from "@/components/ui/alert-dialog";
-import type { Region } from "@/types/region";
+import type { Category } from "@/types/category";
 
 interface DeleteConfirmDialogProps {
   open: boolean;
   onOpenChange: (open: boolean) => void;
-  region: Region | null;
+  category: Category | null;
   onConfirm: () => Promise<void>;
   loading: boolean;
 }
@@ -21,11 +21,11 @@ interface DeleteConfirmDialogProps {
 export const DeleteConfirmDialog = ({
   open,
   onOpenChange,
-  region,
+  category,
   onConfirm,
   loading,
 }: DeleteConfirmDialogProps) => {
-  if (!region) return null;
+  if (!category) return null;
 
   return (
     <AlertDialog open={open} onOpenChange={onOpenChange}>
@@ -34,15 +34,15 @@ export const DeleteConfirmDialog = ({
           <AlertDialogTitle>Êtes-vous sûr ?</AlertDialogTitle>
           <AlertDialogDescription className="space-y-2">
             <p>
-              Vous êtes sur le point de supprimer la région{" "}
+              Vous êtes sur le point de supprimer la catégorie{" "}
               <span className="font-semibold text-foreground">
-                {region.name}
+                {category.name}
               </span>
               .
             </p>
             <p className="text-destructive font-medium">
-              ⚠️ Attention : Si cette région a des langues ou traditions
-              associées, la suppression échouera.
+              ⚠️ Attention : Si cette catégorie a des traditions associées, la
+              suppression échouera.
             </p>
             <p>Cette action est irréversible.</p>
           </AlertDialogDescription>

@@ -92,18 +92,22 @@ export const useAuthStore = create<AuthStore>()(
         useTokenStore.getState().clearTokens();
       },
 
-      // Helpers
+      // Helpers (gère snake_case et camelCase de l'API)
       getFullName: () => {
         const user = get().user;
         if (!user) return "";
-        return `${user.first_name} ${user.last_name}`.trim();
+        const firstName = user.first_name || (user as any).firstName || "";
+        const lastName = user.last_name || (user as any).lastName || "";
+        return `${firstName} ${lastName}`.trim();
       },
 
       getInitials: () => {
         const user = get().user;
         if (!user) return "";
-        const firstInitial = user.first_name?.charAt(0)?.toUpperCase() || "";
-        const lastInitial = user.last_name?.charAt(0)?.toUpperCase() || "";
+        const firstName = user.first_name || (user as any).firstName || "";
+        const lastName = user.last_name || (user as any).lastName || "";
+        const firstInitial = firstName.charAt(0)?.toUpperCase() || "";
+        const lastInitial = lastName.charAt(0)?.toUpperCase() || "";
         return `${firstInitial}${lastInitial}`;
       },
 
