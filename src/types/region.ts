@@ -1,3 +1,5 @@
+import type { Language } from "./language";
+
 // ============================================
 // INTERFACES REGION
 // ============================================
@@ -5,12 +7,14 @@
 export interface Region {
   id: string;
   name: string;
-  slug: string;
-  location: string;
-  longitude: number;
-  latitude: number;
-  createdAt?: string;
-  updatedAt?: string;
+  description?: string;
+  slug?: string;
+  location?: string;
+  longitude?: number;
+  latitude?: number;
+  languages?: Language[];
+  created_at?: string;
+  updated_at?: string;
 }
 
 // Pour GET /api/regions (liste)
@@ -42,14 +46,16 @@ export interface DeleteRegionResponse {
 
 export interface CreateRegionPayload {
   name: string;
+  description?: string;
   slug?: string;
-  location: string;
-  longitude: number;
-  latitude: number;
+  location?: string;
+  longitude?: number;
+  latitude?: number;
 }
 
 export interface UpdateRegionPayload {
   name?: string;
+  description?: string;
   slug?: string;
   location?: string;
   longitude?: number;
@@ -57,25 +63,24 @@ export interface UpdateRegionPayload {
 }
 
 export interface AssignLanguagesPayload {
-  languages: string[]; // IDs des langues
+  languageId: string | string[]; // ID ou tableau d'IDs des langues
 }
 
 export interface UnassignLanguagesPayload {
-  languages: string[]; // IDs des langues
+  languageId: string | string[]; // ID ou tableau d'IDs des langues
 }
 
 // ============================================
 // RESPONSES (Données reçues de l'API)
 // ============================================
 
-// Interface pour la réponse complète
-export interface RegionResponse {
+// Interface pour assign/unassign languages
+export interface AssignLanguagesResponse {
   message: string;
-  regions: Region[];
+  region: Region;
 }
 
-// export interface RegionsListResponse extends Array<Region> {}
-
-export interface AssignLanguagesResponse extends Region {}
-
-export interface UnassignLanguagesResponse extends Region {}
+export interface UnassignLanguagesResponse {
+  message: string;
+  region: Region;
+}

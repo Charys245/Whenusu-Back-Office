@@ -4,7 +4,8 @@ import type {
   UpdateRegionPayload,
   AssignLanguagesPayload,
   UnassignLanguagesPayload,
-  RegionResponse,
+  AssignLanguagesResponse,
+  UnassignLanguagesResponse,
   GetRegionsResponse,
   CreateRegionResponse,
   Region,
@@ -127,28 +128,18 @@ export const regionService = {
 
   /**
    * POST /api/regions/assign/:id
-   * Assigne des langues à une région
+   * Assigne une ou plusieurs langues à une région
    */
   assignLanguages: async (
     id: string,
     payload: AssignLanguagesPayload
-  ): Promise<RegionResponse> => {
+  ): Promise<AssignLanguagesResponse> => {
     try {
       if (!id) throw new Error("L'ID de la région est requis");
 
-      const formData = new FormData();
-      payload.languages.forEach((languageId) => {
-        formData.append("languages[]", languageId);
-      });
-
-      const response = await httpClient.post<RegionResponse>(
+      const response = await httpClient.post<AssignLanguagesResponse>(
         `/regions/assign/${id}`,
-        formData,
-        {
-          headers: {
-            "Content-Type": "multipart/form-data",
-          },
-        }
+        payload
       );
 
       return response.data;
@@ -164,28 +155,18 @@ export const regionService = {
 
   /**
    * POST /api/regions/unassign/:id
-   * Détache des langues d'une région
+   * Détache une ou plusieurs langues d'une région
    */
   unassignLanguages: async (
     id: string,
     payload: UnassignLanguagesPayload
-  ): Promise<RegionResponse> => {
+  ): Promise<UnassignLanguagesResponse> => {
     try {
       if (!id) throw new Error("L'ID de la région est requis");
 
-      const formData = new FormData();
-      payload.languages.forEach((languageId) => {
-        formData.append("languages[]", languageId);
-      });
-
-      const response = await httpClient.post<RegionResponse>(
+      const response = await httpClient.post<UnassignLanguagesResponse>(
         `/regions/unassign/${id}`,
-        formData,
-        {
-          headers: {
-            "Content-Type": "multipart/form-data",
-          },
-        }
+        payload
       );
 
       return response.data;

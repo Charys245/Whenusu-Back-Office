@@ -6,13 +6,15 @@ import { FormModal } from "@/components/shared/FormModal";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
-import { Search } from "lucide-react";
+import { Badge } from "@/components/ui/badge";
+import { Search, Globe } from "lucide-react";
 import type { Region } from "@/types/region";
 import { useRegions } from "@/hooks/useRegions";
 import { formatDate } from "@/utils/dateUtils";
 import { DeleteConfirmDialog } from "@/components/regions/DeleteConfirmDialog";
 import { EditRegionModal } from "@/components/regions/EditRegionModal";
 import { ViewRegionModal } from "@/components/regions/ViewRegionModal";
+import { ManageRegionLanguagesModal } from "@/components/regions/ManageRegionLanguagesModal";
 
 export default function Regions() {
   const [isModalOpen, setIsModalOpen] = useState(false);
@@ -31,6 +33,7 @@ export default function Regions() {
   const [viewModalOpen, setViewModalOpen] = useState(false);
   const [editModalOpen, setEditModalOpen] = useState(false);
   const [deleteDialogOpen, setDeleteDialogOpen] = useState(false);
+  const [languagesModalOpen, setLanguagesModalOpen] = useState(false);
 
   // const columns: Column<Region>[] = [
   //   { key: "name", header: "Région" },
@@ -61,38 +64,65 @@ export default function Regions() {
     },
     { key: "location", header: "Localisation" },
     {
-      key: "longitude",
-      header: "Longitude",
+      key: "languages",
+      header: "Langues",
       render: (region) => (
-        <span className="">{region.longitude}°</span>
+        <div className="flex items-center gap-2">
+          {region.languages && region.languages.length > 0 ? (
+            <div className="flex items-center gap-1">
+              <Badge variant="secondary" className="text-xs">
+                {region.languages.length} langue(s)
+              </Badge>
+              <Button
+                variant="ghost"
+                size="sm"
+                className="h-7 px-2"
+                onClick={(e) => {
+                  e.stopPropagation();
+                  setSelectedRegion(region);
+                  setLanguagesModalOpen(true);
+                }}
+              >
+                <Globe className="h-3.5 w-3.5" />
+              </Button>
+            </div>
+          ) : (
+            <Button
+              variant="outline"
+              size="sm"
+              className="h-7 text-xs"
+              onClick={(e) => {
+                e.stopPropagation();
+                setSelectedRegion(region);
+                setLanguagesModalOpen(true);
+              }}
+            >
+              <Globe className="h-3.5 w-3.5 mr-1" />
+              Ajouter
+            </Button>
+          )}
+        </div>
       ),
     },
     {
-      key: "latitude",
-      header: "Latitude",
-      render: (region) => (
-        <span className=" ">{region.latitude}°</span>
-      ),
-    },
-    {
-      key: "createdAt",
+      key: "created_at",
       header: "Créé le",
       render: (region: Region) =>
-        region.createdAt ? (
+        region.created_at ? (
           <span className="text-muted-foreground">
-            {formatDate(region.createdAt)}
+            {formatDate(region.created_at)}
           </span>
         ) : (
           "-"
         ),
     },
     {
-      key: "updatedAt",
+      key: "updated_at",
       header: "Mise à jour le",
       render: (region: Region) =>
-        region.updatedAt ? (
+        region.updated_at ? (
           <span className="text-muted-foreground">
-            {formatDate(region.updatedAt)}
+            {formatDate(region.updated_at)}
           </span>
         ) : (
           "-"
@@ -165,6 +195,12 @@ export default function Regions() {
           loading={loading}
         />
 
+        <ManageRegionLanguagesModal
+          open={languagesModalOpen}
+          onOpenChange={setLanguagesModalOpen}
+          region={selectedRegion}
+        />
+
         <FormModal
           open={isModalOpen}
           onOpenChange={setIsModalOpen}
@@ -184,7 +220,7 @@ export default function Regions() {
                   longitude: 0,
                   latitude: 0,
                 });
-              } catch (error) {
+              } catch {
                 // L'erreur est déjà gérée dans le hook avec toast
               }
             }}

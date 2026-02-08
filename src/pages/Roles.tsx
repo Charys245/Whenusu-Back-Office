@@ -20,15 +20,12 @@ import {
   DialogTitle,
   DialogTrigger,
 } from "@/components/ui/dialog";
-import { Alert, AlertDescription } from "@/components/ui/alert";
 import { Badge } from "@/components/ui/badge";
 import {
   Shield,
   Key,
   Plus,
   Loader2,
-  AlertCircle,
-  Info,
 } from "lucide-react";
 import { useRoles } from "@/hooks/useRoles";
 
@@ -148,15 +145,6 @@ export default function Roles() {
 
           {/* Onglet Rôles */}
           <TabsContent value="roles" className="space-y-6">
-            {/* Alerte endpoint manquant */}
-            <Alert>
-              <Info className="h-4 w-4" />
-              <AlertDescription>
-                L'endpoint <code className="bg-muted px-1 rounded">GET /api/roles</code> n'est pas encore disponible côté backend.
-                La liste des rôles s'affichera automatiquement une fois l'endpoint implémenté.
-              </AlertDescription>
-            </Alert>
-
             {/* Header avec bouton créer */}
             <div className="flex items-center justify-between">
               <div>
@@ -291,10 +279,10 @@ export default function Roles() {
                   </div>
                 ) : (
                   <div className="text-center py-8 text-muted-foreground">
-                    <AlertCircle className="h-8 w-8 mx-auto mb-2 opacity-50" />
-                    <p>En attente de l'endpoint GET /api/roles</p>
+                    <Shield className="h-8 w-8 mx-auto mb-2 opacity-50" />
+                    <p>Aucun rôle pour le moment</p>
                     <p className="text-sm">
-                      Vous pouvez créer des rôles, ils s'afficheront ici une fois l'endpoint disponible.
+                      Créez votre premier rôle en cliquant sur le bouton ci-dessus.
                     </p>
                   </div>
                 )}
@@ -304,15 +292,6 @@ export default function Roles() {
 
           {/* Onglet Permissions */}
           <TabsContent value="permissions" className="space-y-6">
-            {/* Alerte endpoint manquant */}
-            <Alert>
-              <Info className="h-4 w-4" />
-              <AlertDescription>
-                L'endpoint <code className="bg-muted px-1 rounded">GET /api/permissions</code> n'est pas encore disponible côté backend.
-                La liste des permissions s'affichera automatiquement une fois l'endpoint implémenté.
-              </AlertDescription>
-            </Alert>
-
             {/* Header avec bouton créer */}
             <div className="flex items-center justify-between">
               <div>
@@ -444,10 +423,10 @@ export default function Roles() {
                   </div>
                 ) : (
                   <div className="text-center py-8 text-muted-foreground">
-                    <AlertCircle className="h-8 w-8 mx-auto mb-2 opacity-50" />
-                    <p>En attente de l'endpoint GET /api/permissions</p>
+                    <Key className="h-8 w-8 mx-auto mb-2 opacity-50" />
+                    <p>Aucune permission pour le moment</p>
                     <p className="text-sm">
-                      Vous pouvez créer des permissions, elles s'afficheront ici une fois l'endpoint disponible.
+                      Créez votre première permission en cliquant sur le bouton ci-dessus.
                     </p>
                   </div>
                 )}

@@ -27,12 +27,11 @@ export const roleService = {
   /**
    * GET /api/roles
    * Liste tous les rôles
-   * ⚠️ ENDPOINT PAS ENCORE DISPONIBLE CÔTÉ BACKEND
    */
   getAll: async (): Promise<Role[]> => {
     try {
       const response = await httpClient.get<GetRolesResponse>("/roles");
-      return response.data.data;
+      return response.data;
     } catch (error) {
       const errorMessage = handleApiError(
         error,
@@ -123,7 +122,6 @@ export const roleService = {
   /**
    * GET /api/permissions
    * Liste toutes les permissions
-   * ⚠️ ENDPOINT PAS ENCORE DISPONIBLE CÔTÉ BACKEND
    */
   getAllPermissions: async (): Promise<Permission[]> => {
     try {

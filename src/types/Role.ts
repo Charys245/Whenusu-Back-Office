@@ -20,7 +20,7 @@ export interface Role {
   name: string;
   slug: string;
   description?: string;
-  createdBy?: string;
+  created_by?: string;
   permissions?: Permission[];
   created_at?: string;
   updated_at?: string;
@@ -106,12 +106,10 @@ export interface UserRolesResponse {
 }
 
 /**
- * Réponse liste des rôles (préparé pour quand l'endpoint existera)
+ * Réponse liste des rôles
+ * L'API retourne directement un tableau de rôles
  */
-export interface GetRolesResponse {
-  message: string;
-  data: Role[];
-}
+export type GetRolesResponse = Role[];
 
 /**
  * Réponse liste des permissions (préparé pour quand l'endpoint existera)

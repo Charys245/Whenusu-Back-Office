@@ -1,4 +1,4 @@
-import { useState, useEffect } from "react";
+import { useState } from "react";
 import {
   Dialog,
   DialogContent,
@@ -6,8 +6,6 @@ import {
   DialogTitle,
   DialogDescription,
 } from "@/components/ui/dialog";
-import { Button } from "@/components/ui/button";
-import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Badge } from "@/components/ui/badge";
 import { Loader2, Plus, X, Shield } from "lucide-react";
@@ -28,40 +26,16 @@ export const ManageUserRolesModal = ({
   user,
   onSuccess,
 }: ManageUserRolesModalProps) => {
-  const { roles, fetchRoles, assignRolesToUser, unassignRolesFromUser } =
+  const { roles, rolesQuery, assignRolesToUser, unassignRolesFromUser } =
     useRoles();
 
-  const [roleIdInput, setRoleIdInput] = useState("");
-  const [assignLoading, setAssignLoading] = useState(false);
   const [unassignLoading, setUnassignLoading] = useState<string | null>(null);
-
-  // Charger les rôles disponibles (quand l'endpoint sera prêt)
-  useEffect(() => {
-    if (open) {
-      fetchRoles();
-    }
-  }, [open, fetchRoles]);
+  const [assigningRoleId, setAssigningRoleId] = useState<string | null>(null);
 
   if (!user) return null;
 
   const userRoles = user.roles || [];
   const hasRoles = userRoles.length > 0;
-
-  // Assigner un rôle
-  const handleAssignRole = async () => {
-    if (!roleIdInput.trim()) return;
-
-    setAssignLoading(true);
-    try {
-      await assignRolesToUser(user.id, [roleIdInput.trim()]);
-      setRoleIdInput("");
-      onSuccess?.();
-    } catch {
-      // Error handled by hook
-    } finally {
-      setAssignLoading(false);
-    }
-  };
 
   // Retirer un rôle
   const handleUnassignRole = async (roleId: string) => {
@@ -83,14 +57,14 @@ export const ManageUserRolesModal = ({
       return;
     }
 
-    setAssignLoading(true);
+    setAssigningRoleId(role.id);
     try {
       await assignRolesToUser(user.id, [role.id]);
       onSuccess?.();
     } catch {
       // Error handled by hook
     } finally {
-      setAssignLoading(false);
+      setAssigningRoleId(null);
     }
   };
 
@@ -146,60 +120,42 @@ export const ManageUserRolesModal = ({
             )}
           </div>
 
-          {/* Liste des rôles disponibles (si GET /roles fonctionne) */}
-          {roles.length > 0 && (
-            <div>
-              <Label className="text-sm font-medium">Rôles disponibles</Label>
-              <div className="flex flex-wrap gap-2 mt-2">
-                {availableRoles.length > 0 ? (
-                  availableRoles.map((role) => (
-                    <Badge
-                      key={role.id}
-                      variant="outline"
-                      className="cursor-pointer hover:bg-primary/10"
-                      onClick={() => handleAssignFromList(role)}
-                    >
+          {/* Liste des rôles disponibles */}
+          <div>
+            <Label className="text-sm font-medium">Rôles disponibles</Label>
+            <div className="flex flex-wrap gap-2 mt-2">
+              {rolesQuery.isLoading ? (
+                <div className="flex items-center gap-2 text-sm text-muted-foreground">
+                  <Loader2 className="h-4 w-4 animate-spin" />
+                  Chargement des rôles...
+                </div>
+              ) : availableRoles.length > 0 ? (
+                availableRoles.map((role) => (
+                  <Badge
+                    key={role.id}
+                    variant="outline"
+                    className={`cursor-pointer hover:bg-primary/10 ${assigningRoleId === role.id ? "opacity-50" : ""}`}
+                    onClick={() => !assigningRoleId && handleAssignFromList(role)}
+                  >
+                    {assigningRoleId === role.id ? (
+                      <Loader2 className="h-3 w-3 mr-1 animate-spin" />
+                    ) : (
                       <Plus className="h-3 w-3 mr-1" />
-                      {role.name}
-                    </Badge>
-                  ))
-                ) : (
-                  <p className="text-sm text-muted-foreground">
-                    Tous les rôles sont déjà assignés
-                  </p>
-                )}
-              </div>
+                    )}
+                    {role.name}
+                  </Badge>
+                ))
+              ) : roles.length === 0 ? (
+                <p className="text-sm text-muted-foreground">
+                  Aucun rôle disponible
+                </p>
+              ) : (
+                <p className="text-sm text-muted-foreground">
+                  Tous les rôles sont déjà assignés
+                </p>
+              )}
             </div>
-          )}
-
-          {/* Formulaire manuel (si GET /roles n'est pas disponible) */}
-          {roles.length === 0 && (
-            <div className="space-y-2">
-              <Label htmlFor="roleId">Assigner un rôle par ID</Label>
-              <div className="flex gap-2">
-                <Input
-                  id="roleId"
-                  placeholder="ID du rôle (UUID)"
-                  value={roleIdInput}
-                  onChange={(e) => setRoleIdInput(e.target.value)}
-                  disabled={assignLoading}
-                />
-                <Button
-                  onClick={handleAssignRole}
-                  disabled={!roleIdInput.trim() || assignLoading}
-                >
-                  {assignLoading ? (
-                    <Loader2 className="h-4 w-4 animate-spin" />
-                  ) : (
-                    <Plus className="h-4 w-4" />
-                  )}
-                </Button>
-              </div>
-              <p className="text-xs text-muted-foreground">
-                L'endpoint GET /roles n'est pas encore disponible. Saisissez l'ID du rôle manuellement.
-              </p>
-            </div>
-          )}
+          </div>
         </div>
       </DialogContent>
     </Dialog>

@@ -5,6 +5,7 @@ import {
   DialogHeader,
   DialogTitle,
 } from "@/components/ui/dialog";
+import { Badge } from "@/components/ui/badge";
 
 import type { Region } from "@/types/region";
 import { formatDateTime } from "@/utils/dateUtils";
@@ -63,21 +64,21 @@ export const ViewRegionModal = ({
             </div>
           </div>
 
-          {region.createdAt && (
+          {region.created_at && (
             <div>
               <p className="text-sm font-medium text-muted-foreground">
                 Date de création
               </p>
-              <p className="text-base">{formatDateTime(region.createdAt)}</p>
+              <p className="text-base">{formatDateTime(region.created_at)}</p>
             </div>
           )}
 
-          {region.updatedAt && (
+          {region.updated_at && (
             <div>
               <p className="text-sm font-medium text-muted-foreground">
                 Dernière modification
               </p>
-              <p className="text-base">{formatDateTime(region.updatedAt)}</p>
+              <p className="text-base">{formatDateTime(region.updated_at)}</p>
             </div>
           )}
 
@@ -85,9 +86,19 @@ export const ViewRegionModal = ({
             <p className="text-sm font-medium text-muted-foreground mb-2">
               Langues associées
             </p>
-            <p className="text-sm text-muted-foreground italic">
-              Aucune langue associée pour le moment
-            </p>
+            {region.languages && region.languages.length > 0 ? (
+              <div className="flex flex-wrap gap-2">
+                {region.languages.map((language) => (
+                  <Badge key={language.id} variant="secondary">
+                    {language.name}
+                  </Badge>
+                ))}
+              </div>
+            ) : (
+              <p className="text-sm text-muted-foreground italic">
+                Aucune langue associée
+              </p>
+            )}
           </div>
         </div>
       </DialogContent>
