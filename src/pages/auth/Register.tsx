@@ -17,6 +17,8 @@ import {
 } from "lucide-react";
 import { CURRENT_YEAR } from "@/constants/constants";
 import WHENUSULogo from "@/assets/logo-whenusu.png";
+import { authService } from "@/services/authService";
+import { toast } from "sonner";
 
 type FormState = "idle" | "loading" | "error";
 
@@ -45,19 +47,33 @@ export default function Register() {
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     setFormState("loading");
+    setErrorMessage("");
 
-    // Simulate API call
-    await new Promise((resolve) => setTimeout(resolve, 1500));
+    try {
+      const response = await authService.register({
+        last_name: formData.last_name,
+        first_name: formData.first_name,
+        phone_number: formData.phone_number,
+        password: formData.password,
+        email: formData.email || undefined,
+      });
 
-    // Simulate random error for demo
-    if (Math.random() < 0.3) {
+      // Succès
+      setFormState("idle");
+      toast.success(response.message || "Compte créé avec succès !");
+
+      // Rediriger vers la page de connexion après un court délai
+      setTimeout(() => {
+        navigate("/se-connecter");
+      }, 1500);
+    } catch (error) {
       setFormState("error");
-      setErrorMessage("Ce numéro de téléphone est déjà utilisé.");
-      return;
+      setErrorMessage(
+        error instanceof Error
+          ? error.message
+          : "Une erreur est survenue lors de l'inscription"
+      );
     }
-
-    // Success - redirect to login
-    navigate("/se-connecter");
   };
 
   const isFormValid =

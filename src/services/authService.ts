@@ -47,8 +47,9 @@ export const authService = {
    */
   register: async (payload: RegisterPayload): Promise<RegisterResponse> => {
     try {
-      // Création du FormData pour multipart/form-data
+      // Création du FormData pour multipart/form-data (requis par le backend)
       const formData = new FormData();
+      // Utiliser snake_case pour les noms de champs (comme attendu par le backend)
       formData.append("last_name", payload.last_name);
       formData.append("first_name", payload.first_name);
       formData.append("phone_number", payload.phone_number);
@@ -68,12 +69,7 @@ export const authService = {
       // Appel API
       const response = await httpClient.post<RegisterResponse>(
         "/auth/register/",
-        formData,
-        {
-          headers: {
-            "Content-Type": "multipart/form-data",
-          },
-        }
+        formData
       );
 
       return response.data;
@@ -101,9 +97,19 @@ export const authService = {
    */
   login: async (credentials: LoginCredentials): Promise<LoginResponse> => {
     try {
+      // Utiliser FormData pour multipart/form-data (requis par le backend pour retourner les rôles)
+      const formData = new FormData();
+
+      if ("email" in credentials) {
+        formData.append("email", credentials.email);
+      } else {
+        formData.append("phoneNumber", credentials.phone_number);
+      }
+      formData.append("password", credentials.password);
+
       const response = await httpClient.post<LoginResponse>(
         "/auth/login/",
-        credentials
+        formData
       );
 
       return response.data;

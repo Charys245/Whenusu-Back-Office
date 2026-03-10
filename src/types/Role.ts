@@ -2,28 +2,40 @@
 
 /**
  * Interface pour une permission
+ * Supporte les deux formats: snake_case et camelCase
  */
 export interface Permission {
   id: string;
   name: string;
   slug: string;
-  description?: string;
+  description?: string | null;
+  // snake_case (ancien format)
   created_at?: string;
   updated_at?: string;
+  // camelCase (nouveau format API)
+  createdAt?: string;
+  updatedAt?: string;
 }
 
 /**
  * Interface pour un rôle
+ * Supporte les deux formats: snake_case et camelCase
  */
 export interface Role {
   id: string;
   name: string;
   slug: string;
-  description?: string;
+  description?: string | null;
+  // snake_case (ancien format)
   created_by?: string;
-  permissions?: Permission[];
   created_at?: string;
   updated_at?: string;
+  // camelCase (nouveau format API)
+  createdBy?: string;
+  createdAt?: string;
+  updatedAt?: string;
+  // Permissions du rôle
+  permissions?: Permission[];
 }
 
 // ============================================

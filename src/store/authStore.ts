@@ -55,7 +55,10 @@ interface AuthStore {
   // Helpers
   getFullName: () => string;
   getInitials: () => string;
-  hasRole: (role: string) => boolean;
+  hasRole: (roleSlug: string) => boolean;
+  hasPermission: (permissionSlug: string) => boolean;
+  getUserRoles: () => string[];
+  getPrimaryRole: () => string | null;
 }
 
 export const useAuthStore = create<AuthStore>()(
@@ -111,9 +114,36 @@ export const useAuthStore = create<AuthStore>()(
         return `${firstInitial}${lastInitial}`;
       },
 
-      hasRole: (role: string) => {
+      hasRole: (roleSlug: string) => {
         const user = get().user;
-        return user?.role === role;
+        if (!user?.roles) return false;
+        return user.roles.some((r) => r.slug === roleSlug || r.name === roleSlug);
+      },
+
+      hasPermission: (permissionSlug: string) => {
+        const user = get().user;
+        if (!user?.roles) return false;
+        return user.roles.some((role) =>
+          role.permissions?.some((p) => p.slug === permissionSlug)
+        );
+      },
+
+      getUserRoles: () => {
+        const user = get().user;
+        return user?.roles?.map((r) => r.slug) || [];
+      },
+
+      getPrimaryRole: () => {
+        const user = get().user;
+        if (!user?.roles?.length) return null;
+        // Ordre de priorité des rôles
+        const priority = ["super-admin", "admin", "moderateur", "historien", "expert-tradition", "informant"];
+        for (const role of priority) {
+          if (user.roles.some((r) => r.slug === role)) {
+            return role;
+          }
+        }
+        return user.roles[0]?.slug || null;
       },
     }),
     {

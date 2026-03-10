@@ -4,25 +4,41 @@ import type { Role } from "./Role";
 
 /**
  * Interface principale pour un utilisateur WHENUSU
+ * Supporte les deux formats: snake_case et camelCase
  */
 export interface User {
   id: string;
-  last_name: string;
-  first_name: string;
-  email: string;
-  phone_number: string;
-  avatar_url: string | null;
-  provider: string | null; // "google" | "apple" | "local"
+  // snake_case (ancien format)
+  last_name?: string;
+  first_name?: string;
+  phone_number?: string;
+  avatar_url?: string | null;
   apple_id?: string | null;
   google_id?: string | null;
   otp_code?: string | null;
-  region_id: string | null;
-  send_notif: boolean;
-  role?: string; // Ancien champ (rétrocompatibilité)
-  roles?: Role[]; // Nouveau champ (tableau de rôles)
+  region_id?: string | null;
+  send_notif?: boolean;
   is_active?: boolean;
   created_at?: string;
   updated_at?: string;
+  // camelCase (nouveau format API)
+  lastName?: string;
+  firstName?: string;
+  phoneNumber?: string;
+  avatarUrl?: string | null;
+  appleId?: string | null;
+  googleId?: string | null;
+  otpCode?: string | null;
+  regionId?: string | null;
+  sendNotif?: boolean;
+  isActive?: boolean;
+  createdAt?: string;
+  updatedAt?: string;
+  // Communs
+  email?: string | null;
+  provider?: string | null; // "google" | "apple" | "local"
+  role?: string; // Ancien champ unique (rétrocompatibilité)
+  roles?: Role[]; // Nouveau champ (tableau de rôles)
 }
 
 /**

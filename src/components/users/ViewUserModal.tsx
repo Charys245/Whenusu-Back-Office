@@ -10,6 +10,16 @@ import { Button } from "@/components/ui/button";
 import { Shield } from "lucide-react";
 import type { User } from "@/types/User";
 import { formatDateTime } from "@/utils/dateUtils";
+import {
+  getUserFirstName,
+  getUserLastName,
+  getUserInitials,
+  getUserPhoneNumber,
+  getUserAvatarUrl,
+  getUserSendNotif,
+  getUserCreatedAt,
+  getUserUpdatedAt,
+} from "@/utils/userUtils";
 
 interface ViewUserModalProps {
   open: boolean;
@@ -26,11 +36,16 @@ export const ViewUserModal = ({
 }: ViewUserModalProps) => {
   if (!user) return null;
 
-  const getInitials = (firstName: string, lastName: string) => {
-    return `${firstName?.[0] || ""}${lastName?.[0] || ""}`.toUpperCase();
-  };
+  const firstName = getUserFirstName(user);
+  const lastName = getUserLastName(user);
+  const initials = getUserInitials(user);
+  const phoneNumber = getUserPhoneNumber(user);
+  const avatarUrl = getUserAvatarUrl(user);
+  const sendNotif = getUserSendNotif(user);
+  const createdAt = getUserCreatedAt(user);
+  const updatedAt = getUserUpdatedAt(user);
 
-  const getProviderLabel = (provider: string | null) => {
+  const getProviderLabel = (provider: string | null | undefined) => {
     switch (provider) {
       case "google":
         return "Google";
@@ -54,16 +69,16 @@ export const ViewUserModal = ({
           {/* Avatar et nom */}
           <div className="flex items-center gap-4">
             <Avatar className="h-16 w-16">
-              <AvatarImage src={user.avatar_url || undefined} />
+              <AvatarImage src={avatarUrl || undefined} />
               <AvatarFallback className="bg-primary/10 text-primary text-lg">
-                {getInitials(user.first_name, user.last_name)}
+                {initials}
               </AvatarFallback>
             </Avatar>
             <div>
               <h3 className="text-xl font-semibold">
-                {user.first_name} {user.last_name}
+                {firstName} {lastName}
               </h3>
-              <p className="text-muted-foreground">{user.email}</p>
+              <p className="text-muted-foreground">{user.email || "-"}</p>
             </div>
           </div>
 
@@ -71,11 +86,11 @@ export const ViewUserModal = ({
           <div className="grid grid-cols-2 gap-4">
             <div>
               <p className="text-sm font-medium text-muted-foreground">Prénom</p>
-              <p className="text-base">{user.first_name}</p>
+              <p className="text-base">{firstName || "-"}</p>
             </div>
             <div>
               <p className="text-sm font-medium text-muted-foreground">Nom</p>
-              <p className="text-base">{user.last_name}</p>
+              <p className="text-base">{lastName || "-"}</p>
             </div>
           </div>
 
@@ -88,7 +103,7 @@ export const ViewUserModal = ({
               <p className="text-sm font-medium text-muted-foreground">
                 Téléphone
               </p>
-              <p className="text-base">{user.phone_number || "-"}</p>
+              <p className="text-base">{phoneNumber || "-"}</p>
             </div>
           </div>
 
@@ -108,12 +123,12 @@ export const ViewUserModal = ({
               <Badge
                 variant="secondary"
                 className={`mt-1 ${
-                  user.send_notif
+                  sendNotif
                     ? "bg-green-100 text-green-700"
                     : "bg-gray-100 text-gray-700"
                 }`}
               >
-                {user.send_notif ? "Activées" : "Désactivées"}
+                {sendNotif ? "Activées" : "Désactivées"}
               </Badge>
             </div>
           </div>
@@ -143,20 +158,20 @@ export const ViewUserModal = ({
 
           {/* Dates */}
           <div className="pt-4 border-t grid grid-cols-2 gap-4">
-            {user.created_at && (
+            {createdAt && (
               <div>
                 <p className="text-sm font-medium text-muted-foreground">
                   Date d'inscription
                 </p>
-                <p className="text-base">{formatDateTime(user.created_at)}</p>
+                <p className="text-base">{formatDateTime(createdAt)}</p>
               </div>
             )}
-            {user.updated_at && (
+            {updatedAt && (
               <div>
                 <p className="text-sm font-medium text-muted-foreground">
                   Dernière modification
                 </p>
-                <p className="text-base">{formatDateTime(user.updated_at)}</p>
+                <p className="text-base">{formatDateTime(updatedAt)}</p>
               </div>
             )}
           </div>

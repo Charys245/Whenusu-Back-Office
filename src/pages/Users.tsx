@@ -12,6 +12,15 @@ import { ViewUserModal } from "@/components/users/ViewUserModal";
 import { ManageUserRolesModal } from "@/components/users/ManageUserRolesModal";
 import { formatDate } from "@/utils/dateUtils";
 import type { User } from "@/types/User";
+import {
+  getUserFirstName,
+  getUserLastName,
+  getUserInitials,
+  getUserPhoneNumber,
+  getUserAvatarUrl,
+  getUserSendNotif,
+  getUserCreatedAt,
+} from "@/utils/userUtils";
 
 export default function Users() {
   const [searchQuery, setSearchQuery] = useState("");
@@ -21,11 +30,7 @@ export default function Users() {
   const [viewModalOpen, setViewModalOpen] = useState(false);
   const [rolesModalOpen, setRolesModalOpen] = useState(false);
 
-  const getInitials = (firstName: string, lastName: string) => {
-    return `${firstName?.[0] || ""}${lastName?.[0] || ""}`.toUpperCase();
-  };
-
-  const getProviderBadge = (provider: string | null) => {
+  const getProviderBadge = (provider: string | null | undefined) => {
     switch (provider) {
       case "google":
         return (
@@ -55,16 +60,16 @@ export default function Users() {
       render: (user) => (
         <div className="flex items-center gap-3">
           <Avatar className="h-8 w-8">
-            <AvatarImage src={user.avatar_url || undefined} />
+            <AvatarImage src={getUserAvatarUrl(user) || undefined} />
             <AvatarFallback className="bg-primary/10 text-primary text-xs">
-              {getInitials(user.first_name, user.last_name)}
+              {getUserInitials(user)}
             </AvatarFallback>
           </Avatar>
           <div>
             <p className="font-medium">
-              {user.first_name} {user.last_name}
+              {getUserFirstName(user)} {getUserLastName(user)}
             </p>
-            <p className="text-sm text-muted-foreground">{user.email}</p>
+            <p className="text-sm text-muted-foreground">{user.email || "-"}</p>
           </div>
         </div>
       ),
@@ -74,7 +79,7 @@ export default function Users() {
       header: "Téléphone",
       render: (user) => (
         <span className="text-muted-foreground">
-          {user.phone_number || "-"}
+          {getUserPhoneNumber(user) || "-"}
         </span>
       ),
     },
@@ -86,30 +91,35 @@ export default function Users() {
     {
       key: "send_notif",
       header: "Notifications",
-      render: (user) => (
-        <Badge
-          variant="secondary"
-          className={
-            user.send_notif
-              ? "bg-green-100 text-green-700"
-              : "bg-gray-100 text-gray-500"
-          }
-        >
-          {user.send_notif ? "Activées" : "Désactivées"}
-        </Badge>
-      ),
+      render: (user) => {
+        const sendNotif = getUserSendNotif(user);
+        return (
+          <Badge
+            variant="secondary"
+            className={
+              sendNotif
+                ? "bg-green-100 text-green-700"
+                : "bg-gray-100 text-gray-500"
+            }
+          >
+            {sendNotif ? "Activées" : "Désactivées"}
+          </Badge>
+        );
+      },
     },
     {
       key: "created_at",
       header: "Inscription",
-      render: (user) =>
-        user.created_at ? (
+      render: (user) => {
+        const createdAt = getUserCreatedAt(user);
+        return createdAt ? (
           <span className="text-muted-foreground text-sm">
-            {formatDate(user.created_at)}
+            {formatDate(createdAt)}
           </span>
         ) : (
           "-"
-        ),
+        );
+      },
     },
   ];
 

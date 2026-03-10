@@ -64,6 +64,7 @@ export interface TraditionsFilterParams {
   category_id?: string;
   region_id?: string;
   language_id?: string;
+  status?: TraditionStatus;
 }
 
 // ============================================

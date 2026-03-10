@@ -10,6 +10,8 @@ import { AdminLayout } from "@/components/layout/AdminLayout";
 import Dashboard from "./pages/Dashboard";
 import Traditions from "./pages/Traditions";
 import Informateurs from "./pages/Informateurs";
+import Historiens from "./pages/Historiens";
+import Experts from "./pages/Experts";
 import Langues from "./pages/languages/Langues";
 import Regions from "./pages/regions/Regions";
 import Categories from "./pages/categories/Categories";
@@ -29,6 +31,8 @@ const protectedRoutes = [
   { path: "/dashboard", element: <Dashboard /> },
   { path: "/traditions", element: <Traditions /> },
   { path: "/informateurs", element: <Informateurs /> },
+  { path: "/historiens", element: <Historiens /> },
+  { path: "/experts", element: <Experts /> },
   { path: "/categories", element: <Categories /> },
   { path: "/langues", element: <Langues /> },
   { path: "/regions", element: <Regions /> },
