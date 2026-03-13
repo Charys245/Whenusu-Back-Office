@@ -89,8 +89,8 @@ export const useRegions = () => {
    * Assigner une ou plusieurs langues à une région
    */
   const assignLanguagesMutation = useMutation({
-    mutationFn: ({ regionId, languageId }: { regionId: string; languageId: string | string[] }) =>
-      regionService.assignLanguages(regionId, { languageId }),
+    mutationFn: ({ regionId, languages }: { regionId: string; languages: string[] }) =>
+      regionService.assignLanguages(regionId, { languages }),
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: regionKeys.all });
       toast.success("Langue(s) assignée(s) avec succès !");
@@ -104,8 +104,8 @@ export const useRegions = () => {
    * Détacher une ou plusieurs langues d'une région
    */
   const unassignLanguagesMutation = useMutation({
-    mutationFn: ({ regionId, languageId }: { regionId: string; languageId: string | string[] }) =>
-      regionService.unassignLanguages(regionId, { languageId }),
+    mutationFn: ({ regionId, languages }: { regionId: string; languages: string[] }) =>
+      regionService.unassignLanguages(regionId, { languages }),
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: regionKeys.all });
       toast.success("Langue(s) détachée(s) avec succès !");
@@ -128,11 +128,11 @@ export const useRegions = () => {
   const deleteRegion = (id: string) =>
     deleteRegionMutation.mutateAsync(id);
 
-  const assignLanguages = (regionId: string, languageId: string | string[]) =>
-    assignLanguagesMutation.mutateAsync({ regionId, languageId });
+  const assignLanguages = (regionId: string, languageId: string) =>
+    assignLanguagesMutation.mutateAsync({ regionId, languages: [languageId] });
 
-  const unassignLanguages = (regionId: string, languageId: string | string[]) =>
-    unassignLanguagesMutation.mutateAsync({ regionId, languageId });
+  const unassignLanguages = (regionId: string, languageId: string) =>
+    unassignLanguagesMutation.mutateAsync({ regionId, languages: [languageId] });
 
   return {
     // State (compatibilité avec l'ancienne API)

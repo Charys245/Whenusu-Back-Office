@@ -63,11 +63,11 @@ export interface UpdateRegionPayload {
 }
 
 export interface AssignLanguagesPayload {
-  languageId: string | string[]; // ID ou tableau d'IDs des langues
+  languages: string[]; // Tableau d'IDs des langues
 }
 
 export interface UnassignLanguagesPayload {
-  languageId: string | string[]; // ID ou tableau d'IDs des langues
+  languages: string[]; // Tableau d'IDs des langues
 }
 
 // ============================================

@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import {
   Dialog,
   DialogContent,
@@ -30,38 +30,65 @@ export const ManageRegionLanguagesModal = ({
 
   const [assigningLanguageId, setAssigningLanguageId] = useState<string | null>(null);
   const [unassigningLanguageId, setUnassigningLanguageId] = useState<string | null>(null);
+  const [isProcessing, setIsProcessing] = useState(false);
+
+  // State local pour suivre les langues assignées
+  const [assignedIds, setAssignedIds] = useState<Set<string>>(new Set());
+
+  // Réinitialiser quand on ouvre le modal avec une nouvelle région
+  useEffect(() => {
+    if (open && region) {
+      const initialIds = new Set((region.languages || []).map((l) => l.id));
+      setAssignedIds(initialIds);
+    }
+  }, [open, region?.id]);
 
   if (!region) return null;
 
-  const regionLanguages = region.languages || [];
-  const hasLanguages = regionLanguages.length > 0;
+  // Langues assignées (objets complets pour l'affichage)
+  const assignedLanguages = languages.filter((l) => assignedIds.has(l.id));
+  const hasLanguages = assignedLanguages.length > 0;
 
-  // Langues disponibles (non assignées à cette région)
-  const availableLanguages = languages.filter(
-    (lang) => !regionLanguages.some((rl) => rl.id === lang.id)
-  );
+  // Langues disponibles (non assignées)
+  const availableLanguages = languages.filter((l) => !assignedIds.has(l.id));
 
   // Assigner une langue
   const handleAssignLanguage = async (language: Language) => {
+    if (assignedIds.has(language.id) || isProcessing) return;
+
+    setIsProcessing(true);
     setAssigningLanguageId(language.id);
     try {
       await assignLanguages(region.id, language.id);
+      // Ajouter au state local
+      setAssignedIds((prev) => new Set(prev).add(language.id));
     } catch {
       // Error handled by hook
     } finally {
       setAssigningLanguageId(null);
+      setIsProcessing(false);
     }
   };
 
   // Détacher une langue
-  const handleUnassignLanguage = async (language: Language) => {
-    setUnassigningLanguageId(language.id);
+  const handleUnassignLanguage = async (languageId: string) => {
+    if (isProcessing) return;
+
+    setIsProcessing(true);
+    setUnassigningLanguageId(languageId);
     try {
-      await unassignLanguages(region.id, language.id);
+      await unassignLanguages(region.id, languageId);
+      // Retirer du state local
+      setAssignedIds((prev) => {
+        const newSet = new Set(prev);
+        newSet.delete(languageId);
+        return newSet;
+      });
     } catch {
       // Error handled by hook
     } finally {
       setUnassigningLanguageId(null);
+      setIsProcessing(false);
     }
   };
 
@@ -84,7 +111,7 @@ export const ManageRegionLanguagesModal = ({
             <Label className="text-sm font-medium">Langues associées</Label>
             {hasLanguages ? (
               <div className="flex flex-wrap gap-2 mt-2">
-                {regionLanguages.map((language) => (
+                {assignedLanguages.map((language) => (
                   <Badge
                     key={language.id}
                     variant="secondary"
@@ -92,7 +119,7 @@ export const ManageRegionLanguagesModal = ({
                   >
                     {language.name}
                     <button
-                      onClick={() => handleUnassignLanguage(language)}
+                      onClick={() => handleUnassignLanguage(language.id)}
                       disabled={unassigningLanguageId === language.id}
                       className="ml-1 hover:bg-destructive/20 rounded p-0.5"
                     >
@@ -127,10 +154,10 @@ export const ManageRegionLanguagesModal = ({
                     key={language.id}
                     variant="outline"
                     className={`cursor-pointer hover:bg-primary/10 ${
-                      assigningLanguageId === language.id ? "opacity-50" : ""
+                      isProcessing ? "opacity-50 cursor-not-allowed" : ""
                     }`}
                     onClick={() =>
-                      !assigningLanguageId && handleAssignLanguage(language)
+                      !isProcessing && handleAssignLanguage(language)
                     }
                   >
                     {assigningLanguageId === language.id ? (

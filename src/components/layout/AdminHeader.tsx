@@ -1,7 +1,7 @@
-import { Bell, Search } from "lucide-react";
+import { Bell } from "lucide-react";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { Button } from "@/components/ui/button";
-import { Input } from "@/components/ui/input";
+// import { Input } from "@/components/ui/input";
 import { useCurrentUser, useUserFullName, useUserInitials } from "@/hooks/useAuth";
 
 interface AdminHeaderProps {
@@ -25,14 +25,14 @@ export function AdminHeader({ title, subtitle }: AdminHeaderProps) {
 
       <div className="flex items-center gap-4">
         {/* Search */}
-        <div className="relative hidden md:block">
+        {/* <div className="relative hidden md:block">
           <Search className="absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-muted-foreground" />
           <Input
             type="search"
             placeholder="Rechercher..."
             className="w-64 pl-10 bg-background"
           />
-        </div>
+        </div> */}
 
         {/* Notifications */}
         <Button variant="ghost" size="icon" className="relative">

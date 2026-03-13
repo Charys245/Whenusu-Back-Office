@@ -11,4 +11,14 @@ export default defineConfig({
       "@": path.resolve(__dirname, "./src"),
     },
   },
+  server: {
+    port: 3000,
+    proxy: {
+      "/api": {
+        target: "http://s08k8g8so4g4w4sow4koc84o.144.91.82.57.sslip.io",
+        changeOrigin: true,
+        secure: false,
+      },
+    },
+  },
 });

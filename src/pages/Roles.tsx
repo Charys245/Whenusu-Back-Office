@@ -26,8 +26,10 @@ import {
   Key,
   Plus,
   Loader2,
+  Settings,
 } from "lucide-react";
 import { useRoles } from "@/hooks/useRoles";
+import { ManageRolePermissionsModal } from "@/components/roles/ManageRolePermissionsModal";
 
 export default function Roles() {
   const {
@@ -43,6 +45,13 @@ export default function Roles() {
   // State pour les modals
   const [createRoleOpen, setCreateRoleOpen] = useState(false);
   const [createPermissionOpen, setCreatePermissionOpen] = useState(false);
+  const [managePermissionsOpen, setManagePermissionsOpen] = useState(false);
+  const [selectedRoleId, setSelectedRoleId] = useState<string | null>(null);
+
+  // Trouver le rôle sélectionné dans la liste (toujours à jour)
+  const selectedRole = selectedRoleId
+    ? roles.find((r) => r.id === selectedRoleId) || null
+    : null;
 
   // State pour le formulaire de création de rôle
   const [roleName, setRoleName] = useState("");
@@ -273,6 +282,17 @@ export default function Roles() {
                               {role.permissions.length} permission(s)
                             </Badge>
                           )}
+                          <Button
+                            variant="outline"
+                            size="sm"
+                            onClick={() => {
+                              setSelectedRoleId(role.id);
+                              setManagePermissionsOpen(true);
+                            }}
+                          >
+                            <Settings className="h-4 w-4 mr-1" />
+                            Permissions
+                          </Button>
                         </div>
                       </div>
                     ))}
@@ -469,6 +489,16 @@ export default function Roles() {
             </Card>
           </TabsContent>
         </Tabs>
+
+        {/* Modal pour gérer les permissions d'un rôle */}
+        <ManageRolePermissionsModal
+          open={managePermissionsOpen}
+          onOpenChange={setManagePermissionsOpen}
+          role={selectedRole}
+          onSuccess={() => {
+            fetchRoles();
+          }}
+        />
       </div>
     </div>
   );

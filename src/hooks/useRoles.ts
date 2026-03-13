@@ -64,8 +64,8 @@ export const useRoles = () => {
    * Assigner une permission à un rôle
    */
   const assignPermissionMutation = useMutation({
-    mutationFn: ({ roleId, permissionId }: { roleId: string; permissionId: string }) =>
-      roleService.assignPermission(roleId, { permissionId }),
+    mutationFn: ({ roleId, permissions }: { roleId: string; permissions: string[] }) =>
+      roleService.assignPermission(roleId, { permissions }),
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: roleKeys.all });
       toast.success("Permission assignée avec succès");
@@ -79,8 +79,8 @@ export const useRoles = () => {
    * Retirer une permission d'un rôle
    */
   const unassignPermissionMutation = useMutation({
-    mutationFn: ({ roleId, permissionId }: { roleId: string; permissionId: string }) =>
-      roleService.unassignPermission(roleId, { permissionId }),
+    mutationFn: ({ roleId, permissions }: { roleId: string; permissions: string[] }) =>
+      roleService.unassignPermission(roleId, { permissions }),
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: roleKeys.all });
       toast.success("Permission retirée avec succès");
@@ -152,10 +152,10 @@ export const useRoles = () => {
     createPermissionMutation.mutateAsync(payload);
 
   const assignPermissionToRole = (roleId: string, permissionId: string) =>
-    assignPermissionMutation.mutateAsync({ roleId, permissionId });
+    assignPermissionMutation.mutateAsync({ roleId, permissions: [permissionId] });
 
   const unassignPermissionFromRole = (roleId: string, permissionId: string) =>
-    unassignPermissionMutation.mutateAsync({ roleId, permissionId });
+    unassignPermissionMutation.mutateAsync({ roleId, permissions: [permissionId] });
 
   const assignRolesToUser = (userId: string, rolesId: string[]) =>
     assignRolesToUserMutation.mutateAsync({ userId, rolesId });

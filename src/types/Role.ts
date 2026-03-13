@@ -64,7 +64,7 @@ export interface CreatePermissionPayload {
  * Payload pour assigner/retirer une permission d'un rôle
  */
 export interface RolePermissionPayload {
-  permissionId: string;
+  permissions: string[];
 }
 
 /**

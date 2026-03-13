@@ -210,7 +210,7 @@ export function AdminSidebar() {
         <div className="border-t border-sidebar-border p-4">
           <button
             onClick={handleLogout}
-            className="sidebar-link w-full text-sidebar-foreground/60 hover:text-sidebar-foreground"
+            className="sidebar-link w-full text-sidebar-foreground/60 hover:text-sidebar-foreground cursor-pointer"
           >
             <LogOut className="h-5 w-5" />
             <span>Déconnexion</span>
