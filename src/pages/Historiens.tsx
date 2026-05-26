@@ -37,6 +37,7 @@ import {
 import { DataTable, type Column } from "@/components/shared/DataTable";
 import { useTraditions } from "@/hooks/useTraditions";
 import { formatDate } from "@/utils/dateUtils";
+import { getMediaUrl } from "@/utils/helpers";
 import type { Tradition, TraditionStatus } from "@/types/tradition";
 
 type ValidationStatus = "validated" | "rejected" | "to_verify";
@@ -114,7 +115,7 @@ export default function Historiens() {
         <div className="flex items-center gap-3">
           {item.coverImg && (
             <img
-              src={item.coverImg}
+              src={getMediaUrl(item.coverImg)}
               alt=""
               className="h-10 w-10 rounded object-cover"
             />
@@ -249,7 +250,7 @@ export default function Historiens() {
                     Média (Audio/Vidéo)
                   </p>
                   <div className="bg-muted rounded-lg p-4">
-                    <audio controls className="w-full" src={selectedTradition.mediaUrl}>
+                    <audio controls className="w-full" src={getMediaUrl(selectedTradition.mediaUrl)}>
                       <track kind="captions" />
                       Votre navigateur ne supporte pas l'audio.
                     </audio>

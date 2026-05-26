@@ -44,6 +44,7 @@ import { useCategories } from "@/hooks/useCategories";
 import { useRegions } from "@/hooks/useRegions";
 import { useLanguages } from "@/hooks/useLanguages";
 import { formatDate } from "@/utils/dateUtils";
+import { getMediaUrl } from "@/utils/helpers";
 import type { Tradition, TraditionStatus, TraditionsFilterParams } from "@/types/tradition";
 import { ViewTraditionModal } from "@/components/traditions/ViewTraditionModal";
 import { CreateTraditionModal } from "@/components/traditions/CreateTraditionModal";
@@ -178,7 +179,7 @@ export default function Traditions() {
 
         {/* Filtres */}
         <div className="flex flex-wrap items-center gap-4">
-          <div className="relative flex-1 min-w-[200px] max-w-sm">
+          <div className="relative flex-1 min-w-50 max-w-sm">
             <Search className="absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-muted-foreground" />
             <Input
               placeholder="Rechercher par titre..."
@@ -193,7 +194,7 @@ export default function Traditions() {
             value={filters.category_id || "all"}
             onValueChange={(value) => handleFilterChange("category_id", value)}
           >
-            <SelectTrigger className="w-[180px]">
+            <SelectTrigger className="w-45">
               <SelectValue placeholder="Catégorie" />
             </SelectTrigger>
             <SelectContent>
@@ -210,7 +211,7 @@ export default function Traditions() {
             value={filters.region_id || "all"}
             onValueChange={(value) => handleFilterChange("region_id", value)}
           >
-            <SelectTrigger className="w-[180px]">
+            <SelectTrigger className="w-45">
               <SelectValue placeholder="Région" />
             </SelectTrigger>
             <SelectContent>
@@ -227,7 +228,7 @@ export default function Traditions() {
             value={filters.language_id || "all"}
             onValueChange={(value) => handleFilterChange("language_id", value)}
           >
-            <SelectTrigger className="w-[180px]">
+            <SelectTrigger className="w-45">
               <SelectValue placeholder="Langue" />
             </SelectTrigger>
             <SelectContent>
@@ -282,7 +283,7 @@ export default function Traditions() {
                         <div className="flex items-center gap-3">
                           {tradition.coverImg && (
                             <img
-                              src={tradition.coverImg}
+                              src={getMediaUrl(tradition.coverImg)}
                               alt=""
                               className="w-10 h-10 rounded object-cover"
                             />

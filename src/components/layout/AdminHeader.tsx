@@ -1,4 +1,5 @@
-import { Bell } from "lucide-react";
+import { useState, useEffect } from "react";
+import { Bell, Moon, Sun } from "lucide-react";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { Button } from "@/components/ui/button";
 // import { Input } from "@/components/ui/input";
@@ -13,6 +14,27 @@ export function AdminHeader({ title, subtitle }: AdminHeaderProps) {
   const user = useCurrentUser();
   const fullName = useUserFullName();
   const initials = useUserInitials();
+
+  // État du mode sombre avec persistance localStorage
+  const [darkMode, setDarkMode] = useState<boolean>(() => {
+    const stored = localStorage.getItem("whenusu-dark-mode");
+    if (stored !== null) {
+      return stored === "true";
+    }
+    // Détecter la préférence système par défaut
+    return window.matchMedia("(prefers-color-scheme: dark)").matches;
+  });
+
+  // Synchroniser le mode sombre avec le DOM
+  useEffect(() => {
+    const root = window.document.documentElement;
+    if (darkMode) {
+      root.classList.add("dark");
+    } else {
+      root.classList.remove("dark");
+    }
+    localStorage.setItem("whenusu-dark-mode", String(darkMode));
+  }, [darkMode]);
 
   return (
     <header className="sticky top-0 z-30 flex h-20 items-center justify-between border-b border-border bg-card/80 backdrop-blur-sm px-8">
@@ -33,6 +55,19 @@ export function AdminHeader({ title, subtitle }: AdminHeaderProps) {
             className="w-64 pl-10 bg-background"
           />
         </div> */}
+
+        {/* Toggle Mode Sombre */}
+        <button
+          onClick={() => setDarkMode(!darkMode)}
+          className="p-2 rounded-xl bg-white dark:bg-[#242019] border border-[#E5DDD3] dark:border-[#3A3027] hover:border-[#C6922E] dark:hover:border-[#D4A43A] text-[#3D2E1F] dark:text-[#F9F7F5] transition-all shadow-sm cursor-pointer"
+          aria-label="Changer le thème"
+        >
+          {darkMode ? (
+            <Sun size={18} className="text-[#D4A43A]" />
+          ) : (
+            <Moon size={18} className="text-[#3D2E1F]" />
+          )}
+        </button>
 
         {/* Notifications */}
         <Button variant="ghost" size="icon" className="relative">

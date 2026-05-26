@@ -276,13 +276,13 @@ export const CreateTraditionModal = ({
               </div>
             </div>
 
-            {/* Média audio/vidéo */}
+            {/* Média audio */}
             <div className="space-y-2">
-              <Label>Média audio/vidéo *</Label>
+              <Label>Média audio *</Label>
               <input
                 ref={mediaInputRef}
                 type="file"
-                accept="audio/mpeg,audio/wav,audio/m4a,video/mp4,video/quicktime"
+                accept="audio/mpeg,audio/wav,audio/m4a"
                 onChange={handleMediaChange}
                 className="hidden"
               />
@@ -294,7 +294,7 @@ export const CreateTraditionModal = ({
                   {mediaFile ? (
                     <>
                       <Music className="h-8 w-8 mb-2 text-primary" />
-                      <span className="text-sm text-primary font-medium">
+                      <span className="text-sm text-primary font-medium max-w-full text-center line-clamp-2 px-2">
                         {mediaFile.name}
                       </span>
                       <span className="text-xs">
@@ -305,7 +305,7 @@ export const CreateTraditionModal = ({
                     <>
                       <Upload className="h-8 w-8 mb-2" />
                       <span className="text-sm">Cliquer pour ajouter</span>
-                      <span className="text-xs">MP3, WAV, MP4, MOV (max 80MB)</span>
+                      <span className="text-xs">MP3, WAV, M4A (max 80MB)</span>
                     </>
                   )}
                 </div>

@@ -8,6 +8,7 @@ import { Badge } from "@/components/ui/badge";
 import { Separator } from "@/components/ui/separator";
 import type { Tradition, TraditionStatus } from "@/types/tradition";
 import { formatDateTime } from "@/utils/dateUtils";
+import { getMediaUrl } from "@/utils/helpers";
 
 interface ViewTraditionModalProps {
   open: boolean;
@@ -30,6 +31,8 @@ export const ViewTraditionModal = ({
   if (!tradition) return null;
 
   const status = statusConfig[tradition.status];
+  const coverUrl = getMediaUrl(tradition.coverImg);
+  const mediaUrl = getMediaUrl(tradition.mediaUrl);
 
   return (
     <Dialog open={open} onOpenChange={onOpenChange}>
@@ -43,35 +46,27 @@ export const ViewTraditionModal = ({
 
         <div className="space-y-6">
           {/* Image de couverture */}
-          {tradition.coverImg && (
+          {coverUrl && (
             <div className="relative aspect-video rounded-lg overflow-hidden bg-muted">
               <img
-                src={tradition.coverImg}
+                src={coverUrl}
                 alt={tradition.title}
                 className="w-full h-full object-cover"
               />
             </div>
           )}
 
-          {/* Média audio/vidéo */}
-          {tradition.mediaUrl && (
+          {/* Média audio */}
+          {mediaUrl && (
             <div>
               <p className="text-sm font-medium text-muted-foreground mb-2">
-                Média
+                Audio
               </p>
-              {tradition.mediaUrl.includes(".mp4") || tradition.mediaUrl.includes(".mov") ? (
-                <video
-                  src={tradition.mediaUrl}
-                  controls
-                  className="w-full rounded-lg"
-                />
-              ) : (
-                <audio
-                  src={tradition.mediaUrl}
-                  controls
-                  className="w-full"
-                />
-              )}
+              <audio
+                src={mediaUrl}
+                controls
+                className="w-full"
+              />
             </div>
           )}
 

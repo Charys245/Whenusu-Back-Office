@@ -15,6 +15,54 @@ import type {
 } from "@/types/tradition";
 
 // ============================================
+// HELPERS - Transformation snake_case -> camelCase
+// ============================================
+
+interface TraditionApiResponse {
+  id: string;
+  title: string;
+  slug: string;
+  transcription: string;
+  cover_img?: string;
+  media_url?: string;
+  status: Tradition["status"];
+  favoris_count: number;
+  user_id: string;
+  category_id: string;
+  region_id: string;
+  language_id: string;
+  informant_id: string;
+  created_at?: string;
+  updated_at?: string;
+  category?: Tradition["category"];
+  region?: Tradition["region"];
+  language?: Tradition["language"];
+  informant?: Tradition["informant"];
+}
+
+const mapTraditionFromApi = (data: TraditionApiResponse): Tradition => ({
+  id: data.id,
+  title: data.title,
+  slug: data.slug,
+  transcription: data.transcription,
+  coverImg: data.cover_img,
+  mediaUrl: data.media_url,
+  status: data.status,
+  favorisCount: data.favoris_count ?? 0,
+  userId: data.user_id,
+  categoryId: data.category_id,
+  regionId: data.region_id,
+  languageId: data.language_id,
+  informantId: data.informant_id,
+  createdAt: data.created_at,
+  updatedAt: data.updated_at,
+  category: data.category,
+  region: data.region,
+  language: data.language,
+  informant: data.informant,
+});
+
+// ============================================
 // SERVICE TRADITIONS
 // ============================================
 
@@ -31,7 +79,7 @@ export const traditionService = {
         params,
       });
       return {
-        traditions: response.data.data.data,
+        traditions: (response.data.data.data as unknown as TraditionApiResponse[]).map(mapTraditionFromApi),
         meta: response.data.data.meta,
       };
     } catch (error) {
@@ -55,7 +103,7 @@ export const traditionService = {
       const response = await httpClient.get<GetTraditionResponse>(
         `/traditions/${id}`
       );
-      return response.data.data;
+      return mapTraditionFromApi(response.data.data as unknown as TraditionApiResponse);
     } catch (error) {
       const errorMessage = handleApiError(
         error,
@@ -92,7 +140,7 @@ export const traditionService = {
         }
       );
 
-      return response.data.data;
+      return mapTraditionFromApi(response.data.data as unknown as TraditionApiResponse);
     } catch (error) {
       const errorMessage = handleApiError(
         error,
@@ -131,7 +179,7 @@ export const traditionService = {
         }
       );
 
-      return response.data.data;
+      return mapTraditionFromApi(response.data.data as unknown as TraditionApiResponse);
     } catch (error) {
       const errorMessage = handleApiError(
         error,
@@ -170,7 +218,7 @@ export const traditionService = {
       const response = await httpClient.get<PopularTraditionsResponse>(
         "/traditions/popular"
       );
-      return response.data.data;
+      return (response.data.data as unknown as TraditionApiResponse[]).map(mapTraditionFromApi);
     } catch (error) {
       const errorMessage = handleApiError(
         error,
@@ -192,7 +240,7 @@ export const traditionService = {
       const response = await httpClient.post<StatusChangeResponse>(
         `/traditions/validate/${id}`
       );
-      return response.data.data;
+      return mapTraditionFromApi(response.data.data as unknown as TraditionApiResponse);
     } catch (error) {
       const errorMessage = handleApiError(
         error,
@@ -214,7 +262,7 @@ export const traditionService = {
       const response = await httpClient.post<StatusChangeResponse>(
         `/traditions/reject/${id}`
       );
-      return response.data.data;
+      return mapTraditionFromApi(response.data.data as unknown as TraditionApiResponse);
     } catch (error) {
       const errorMessage = handleApiError(
         error,
@@ -236,7 +284,7 @@ export const traditionService = {
       const response = await httpClient.post<StatusChangeResponse>(
         `/traditions/archive/${id}`
       );
-      return response.data.data;
+      return mapTraditionFromApi(response.data.data as unknown as TraditionApiResponse);
     } catch (error) {
       const errorMessage = handleApiError(
         error,

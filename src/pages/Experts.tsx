@@ -37,6 +37,7 @@ import {
 import { DataTable, type Column } from "@/components/shared/DataTable";
 import { useTraditions } from "@/hooks/useTraditions";
 import { formatDate } from "@/utils/dateUtils";
+import { getMediaUrl } from "@/utils/helpers";
 import type { Tradition, TraditionStatus } from "@/types/tradition";
 
 type AuthenticityStatus = "authentic" | "partially_authentic" | "not_conform";
@@ -134,7 +135,7 @@ export default function Experts() {
         <div className="flex items-center gap-3">
           {item.coverImg && (
             <img
-              src={item.coverImg}
+              src={getMediaUrl(item.coverImg)}
               alt=""
               className="h-10 w-10 rounded object-cover"
             />
@@ -274,13 +275,13 @@ export default function Experts() {
                       <video
                         controls
                         className="w-full rounded"
-                        src={selectedTradition.mediaUrl}
+                        src={getMediaUrl(selectedTradition.mediaUrl)}
                       >
                         <track kind="captions" />
                         Votre navigateur ne supporte pas la vidéo.
                       </video>
                     ) : (
-                      <audio controls className="w-full" src={selectedTradition.mediaUrl}>
+                      <audio controls className="w-full" src={getMediaUrl(selectedTradition.mediaUrl)}>
                         <track kind="captions" />
                         Votre navigateur ne supporte pas l'audio.
                       </audio>

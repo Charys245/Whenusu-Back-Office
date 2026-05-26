@@ -78,7 +78,7 @@ export const ViewUserModal = ({
               <h3 className="text-xl font-semibold">
                 {firstName} {lastName}
               </h3>
-              <p className="text-muted-foreground">{user.email || "-"}</p>
+              <p className="text-muted-foreground truncate max-w-25 ">{user.email || "-"}</p>
             </div>
           </div>
 
