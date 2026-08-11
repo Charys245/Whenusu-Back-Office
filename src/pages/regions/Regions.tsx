@@ -7,7 +7,7 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Badge } from "@/components/ui/badge";
-import { Search, Globe } from "lucide-react";
+import { Globe } from "lucide-react";
 import type { Region } from "@/types/region";
 import { useRegions } from "@/hooks/useRegions";
 import { formatDate } from "@/utils/dateUtils";
@@ -18,7 +18,7 @@ import { ManageRegionLanguagesModal } from "@/components/regions/ManageRegionLan
 
 export default function Regions() {
   const [isModalOpen, setIsModalOpen] = useState(false);
-  const [searchQuery, setSearchQuery] = useState("");
+  // const [searchQuery, setSearchQuery] = useState("");
   const { regions, loading, createRegion, updateRegion, deleteRegion } =
     useRegions();
 
@@ -140,7 +140,7 @@ export default function Regions() {
           subtitle={`${regions.length} régions enregistrées`}
           action={{ label: "Ajouter", onClick: () => setIsModalOpen(true) }}
         >
-          <div className="relative">
+          {/* <div className="relative">
             <Search className="absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-muted-foreground" />
             <Input
               placeholder="Rechercher..."
@@ -148,7 +148,7 @@ export default function Regions() {
               value={searchQuery}
               onChange={(e) => setSearchQuery(e.target.value)}
             />
-          </div>
+          </div> */}
         </PageHeader>
 
         <DataTable

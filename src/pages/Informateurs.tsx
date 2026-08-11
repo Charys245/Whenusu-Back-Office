@@ -6,7 +6,7 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
-import { Search, Upload, X, Loader2 } from "lucide-react";
+import { Upload, X, Loader2 } from "lucide-react";
 import { DataTable, type Column } from "@/components/shared/DataTable";
 import { useInformateurs } from "@/hooks/useInformateurs";
 import { formatDate } from "@/utils/dateUtils";
@@ -17,7 +17,7 @@ import type { Informateur, CreateInformateurPayload } from "@/types/informateur"
 
 export default function Informateurs() {
   const [isModalOpen, setIsModalOpen] = useState(false);
-  const [searchQuery, setSearchQuery] = useState("");
+  const [searchQuery, __setSearchQuery] = useState("");
   const [selectedInformateur, setSelectedInformateur] =
     useState<Informateur | null>(null);
   const [viewModalOpen, setViewModalOpen] = useState(false);
@@ -199,7 +199,7 @@ export default function Informateurs() {
           subtitle={`${filteredInformateurs.length} informateur${filteredInformateurs.length > 1 ? "s" : ""} enregistré${filteredInformateurs.length > 1 ? "s" : ""}`}
           action={{ label: "Ajouter", onClick: () => setIsModalOpen(true) }}
         >
-          <div className="relative">
+          {/* <div className="relative">
             <Search className="absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-muted-foreground" />
             <Input
               placeholder="Rechercher..."
@@ -207,7 +207,7 @@ export default function Informateurs() {
               value={searchQuery}
               onChange={(e) => setSearchQuery(e.target.value)}
             />
-          </div>
+          </div> */}
         </PageHeader>
 
         {loading && informateurs.length === 0 ? (

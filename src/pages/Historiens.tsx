@@ -3,7 +3,7 @@ import { AdminHeader } from "@/components/layout/AdminHeader";
 import { PageHeader } from "@/components/shared/PageHeader";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
-import { Input } from "@/components/ui/input";
+// import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
 import { Label } from "@/components/ui/label";
 import {
@@ -22,7 +22,7 @@ import {
 } from "@/components/ui/select";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import {
-  Search,
+  // Search,
   CheckCircle2,
   XCircle,
   AlertTriangle,
@@ -54,7 +54,7 @@ const statusConfig: Record<
 
 export default function Historiens() {
   const [activeTab, setActiveTab] = useState<"pending" | "all">("pending");
-  const [searchQuery, setSearchQuery] = useState("");
+  const [searchQuery, __setSearchQuery] = useState("");
   const [selectedTradition, setSelectedTradition] = useState<Tradition | null>(null);
   const [reviewModalOpen, setReviewModalOpen] = useState(false);
   const [avisScientifique, setAvisScientifique] = useState("");
@@ -181,7 +181,7 @@ export default function Historiens() {
           title="Traditions en attente"
           subtitle={`${pendingCount} tradition(s) à valider`}
         >
-          <div className="relative">
+          {/* <div className="relative">
             <Search className="absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-muted-foreground" />
             <Input
               placeholder="Rechercher..."
@@ -189,7 +189,7 @@ export default function Historiens() {
               value={searchQuery}
               onChange={(e) => setSearchQuery(e.target.value)}
             />
-          </div>
+          </div> */}
         </PageHeader>
 
         <Tabs value={activeTab} onValueChange={(v) => setActiveTab(v as "pending" | "all")}>

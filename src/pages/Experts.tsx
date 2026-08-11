@@ -3,7 +3,7 @@ import { AdminHeader } from "@/components/layout/AdminHeader";
 import { PageHeader } from "@/components/shared/PageHeader";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
-import { Input } from "@/components/ui/input";
+// import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
 import { Label } from "@/components/ui/label";
 import {
@@ -22,7 +22,6 @@ import {
 } from "@/components/ui/select";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import {
-  Search,
   CheckCircle2,
   AlertCircle,
   XCircle,
@@ -44,7 +43,10 @@ type AuthenticityStatus = "authentic" | "partially_authentic" | "not_conform";
 
 const statusConfig: Record<
   TraditionStatus,
-  { label: string; variant: "default" | "secondary" | "destructive" | "outline" }
+  {
+    label: string;
+    variant: "default" | "secondary" | "destructive" | "outline";
+  }
 > = {
   pending: { label: "En attente", variant: "secondary" },
   validate: { label: "Validée", variant: "default" },
@@ -75,11 +77,15 @@ const authenticityConfig: Record<
 
 export default function Experts() {
   const [activeTab, setActiveTab] = useState<"pending" | "all">("pending");
-  const [searchQuery, setSearchQuery] = useState("");
-  const [selectedTradition, setSelectedTradition] = useState<Tradition | null>(null);
+  const [searchQuery, __setSearchQuery] = useState("");
+  const [selectedTradition, setSelectedTradition] = useState<Tradition | null>(
+    null
+  );
   const [reviewModalOpen, setReviewModalOpen] = useState(false);
   const [commentaireCulturel, setCommentaireCulturel] = useState("");
-  const [authenticityStatus, setAuthenticityStatus] = useState<AuthenticityStatus | "">("");
+  const [authenticityStatus, setAuthenticityStatus] = useState<
+    AuthenticityStatus | ""
+  >("");
   const [isSubmitting, setIsSubmitting] = useState(false);
 
   const {
@@ -201,7 +207,7 @@ export default function Experts() {
           title="Traditions à vérifier"
           subtitle={`${pendingCount} tradition(s) en attente de vérification`}
         >
-          <div className="relative">
+          {/* <div className="relative">
             <Search className="absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-muted-foreground" />
             <Input
               placeholder="Rechercher..."
@@ -209,10 +215,13 @@ export default function Experts() {
               value={searchQuery}
               onChange={(e) => setSearchQuery(e.target.value)}
             />
-          </div>
+          </div> */}
         </PageHeader>
 
-        <Tabs value={activeTab} onValueChange={(v) => setActiveTab(v as "pending" | "all")}>
+        <Tabs
+          value={activeTab}
+          onValueChange={(v) => setActiveTab(v as "pending" | "all")}
+        >
           <TabsList className="mb-6">
             <TabsTrigger value="pending">
               <Clock className="mr-2 h-4 w-4" />
@@ -225,7 +234,9 @@ export default function Experts() {
             {loading ? (
               <div className="flex items-center justify-center py-12">
                 <Loader2 className="h-8 w-8 animate-spin text-primary" />
-                <span className="ml-2 text-muted-foreground">Chargement...</span>
+                <span className="ml-2 text-muted-foreground">
+                  Chargement...
+                </span>
               </div>
             ) : (
               <DataTable
@@ -253,11 +264,15 @@ export default function Experts() {
               {/* Informations de la tradition */}
               <div className="grid grid-cols-2 gap-4">
                 <div className="space-y-1">
-                  <p className="text-sm font-medium text-muted-foreground">Titre</p>
+                  <p className="text-sm font-medium text-muted-foreground">
+                    Titre
+                  </p>
                   <p className="font-semibold">{selectedTradition.title}</p>
                 </div>
                 <div className="space-y-1">
-                  <p className="text-sm font-medium text-muted-foreground">Catégorie</p>
+                  <p className="text-sm font-medium text-muted-foreground">
+                    Catégorie
+                  </p>
                   <p>{selectedTradition.category?.name || "-"}</p>
                 </div>
               </div>
@@ -281,7 +296,11 @@ export default function Experts() {
                         Votre navigateur ne supporte pas la vidéo.
                       </video>
                     ) : (
-                      <audio controls className="w-full" src={getMediaUrl(selectedTradition.mediaUrl)}>
+                      <audio
+                        controls
+                        className="w-full"
+                        src={getMediaUrl(selectedTradition.mediaUrl)}
+                      >
                         <track kind="captions" />
                         Votre navigateur ne supporte pas l'audio.
                       </audio>
@@ -298,7 +317,8 @@ export default function Experts() {
                 </p>
                 <div className="bg-muted rounded-lg p-4 max-h-40 overflow-y-auto">
                   <p className="text-sm whitespace-pre-wrap">
-                    {selectedTradition.transcription || "Aucune transcription disponible"}
+                    {selectedTradition.transcription ||
+                      "Aucune transcription disponible"}
                   </p>
                 </div>
               </div>
@@ -317,7 +337,9 @@ export default function Experts() {
                 <div className="flex items-center gap-2">
                   <MapPin className="h-4 w-4 text-muted-foreground" />
                   <div>
-                    <p className="text-xs text-muted-foreground">Région / Ethnie</p>
+                    <p className="text-xs text-muted-foreground">
+                      Région / Ethnie
+                    </p>
                     <p className="text-sm font-medium">
                       {selectedTradition.region?.name || "-"}
                     </p>
@@ -340,23 +362,27 @@ export default function Experts() {
                   <Label>Avis sur l'authenticité</Label>
                   <Select
                     value={authenticityStatus}
-                    onValueChange={(v) => setAuthenticityStatus(v as AuthenticityStatus)}
+                    onValueChange={(v) =>
+                      setAuthenticityStatus(v as AuthenticityStatus)
+                    }
                   >
                     <SelectTrigger>
                       <SelectValue placeholder="Choisir un avis..." />
                     </SelectTrigger>
                     <SelectContent>
-                      {Object.entries(authenticityConfig).map(([key, config]) => {
-                        const Icon = config.icon;
-                        return (
-                          <SelectItem key={key} value={key}>
-                            <div className="flex items-center gap-2">
-                              <Icon className={`h-4 w-4 ${config.color}`} />
-                              {config.label}
-                            </div>
-                          </SelectItem>
-                        );
-                      })}
+                      {Object.entries(authenticityConfig).map(
+                        ([key, config]) => {
+                          const Icon = config.icon;
+                          return (
+                            <SelectItem key={key} value={key}>
+                              <div className="flex items-center gap-2">
+                                <Icon className={`h-4 w-4 ${config.color}`} />
+                                {config.label}
+                              </div>
+                            </SelectItem>
+                          );
+                        }
+                      )}
                     </SelectContent>
                   </Select>
                 </div>
@@ -371,8 +397,9 @@ export default function Experts() {
                     rows={4}
                   />
                   <p className="text-xs text-muted-foreground">
-                    Ce commentaire sera visible par les administrateurs et pourra être utilisé
-                    pour enrichir la documentation de la tradition.
+                    Ce commentaire sera visible par les administrateurs et
+                    pourra être utilisé pour enrichir la documentation de la
+                    tradition.
                   </p>
                 </div>
               </div>

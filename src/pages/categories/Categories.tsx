@@ -5,7 +5,7 @@ import { FormModal } from "@/components/shared/FormModal";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
-import { Search, Loader2 } from "lucide-react";
+import { Loader2 } from "lucide-react";
 import { DataTable, type Column } from "@/components/shared/DataTable";
 import { useCategories } from "@/hooks/useCategories";
 import { ViewCategoryModal } from "@/components/categories/ViewCategoryModal";
@@ -16,7 +16,7 @@ import type { Category } from "@/types/category";
 
 export default function Categories() {
   const [isModalOpen, setIsModalOpen] = useState(false);
-  const [searchQuery, setSearchQuery] = useState("");
+  const [searchQuery, __setSearchQuery] = useState("");
   const [selectedCategory, setSelectedCategory] = useState<Category | null>(
     null
   );
@@ -133,7 +133,7 @@ export default function Categories() {
           subtitle={`${filteredCategories.length} catégorie${filteredCategories.length > 1 ? "s" : ""} enregistrée${filteredCategories.length > 1 ? "s" : ""}`}
           action={{ label: "Ajouter", onClick: () => setIsModalOpen(true) }}
         >
-          <div className="relative">
+          {/* <div className="relative">
             <Search className="absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-muted-foreground" />
             <Input
               placeholder="Rechercher..."
@@ -141,7 +141,7 @@ export default function Categories() {
               value={searchQuery}
               onChange={(e) => setSearchQuery(e.target.value)}
             />
-          </div>
+          </div> */}
         </PageHeader>
 
         {loading && categories.length === 0 ? (
